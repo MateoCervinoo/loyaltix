@@ -1,0 +1,14 @@
+{
+  "name": "loyaltix_backend",
+  "version": "1.0.0",
+  "description": "Backend para un proyecto de sistemas de puntos para que los clientes puedan intercambiar por beneficios",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

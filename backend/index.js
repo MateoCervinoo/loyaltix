@@ -1,5 +1,6 @@
 const express = require("express");
 const sequelize = require("./database/database");
+const clientesRoutes = require('./routes/cliente.route')
 
 // Crear servidor
 const app = express();
@@ -9,6 +10,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("Backend de LoyalTix");
 });
+
+// Routes
+app.use('/api/clientes', clientesRoutes);
 
 // Configuración general
 const port = 3000;

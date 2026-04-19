@@ -1,6 +1,9 @@
 const express = require("express");
 const sequelize = require("./database/database");
-const clientesRoutes = require('./routes/cliente.route')
+const clientesRoutes = require('./routes/cliente.route');
+const institucionesRoutes = require('./routes/institucion.route');
+const profesionesRoutes = require('./routes/profesion.route');
+const usuariosRoutes = require('./routes/usuario.route');
 
 // Crear servidor
 const app = express();
@@ -13,6 +16,9 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use('/api/clientes', clientesRoutes);
+app.use('/api/instituciones', institucionesRoutes);
+app.use('/api/profesiones', profesionesRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 
 // Configuración general
 const port = 3000;

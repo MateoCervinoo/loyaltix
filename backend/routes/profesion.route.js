@@ -4,8 +4,15 @@ const router = express.Router();
 const Profesion = require('../models/profesion.model');
 const { ValidationError } = require('sequelize');
 
+const authMiddleware = require('../middlewares/auth.middleware');
+const roleMiddleware = require('../middlewares/role.middleware');
+
 // GET /api/profesiones
-router.get('/', async (req, res) => {
+router.get(
+    '/',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
     try {
         const items = await Profesion.findAll();
         res.json(items);
@@ -19,7 +26,11 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/profesiones/:id
-router.get('/:id', async (req, res) => {
+router.get(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
     try {
         const item = await Profesion.findByPk(req.params.id);
 
@@ -41,7 +52,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/profesiones
-router.post('/', async (req, res) => {
+router.post(
+    '/',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    async (req, res) => {
     try {
         const item = await Profesion.create({
             nombre: req.body.nombre
@@ -68,7 +83,11 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/profesiones/:id
-router.put('/:id', async (req, res) => {
+router.put(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    async (req, res) => {
     try {
         const item = await Profesion.findByPk(req.params.id);
 
@@ -104,7 +123,11 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/profesiones/:id
-router.delete('/:id', async (req, res) => {
+router.delete(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    async (req, res) => {
     try {
         const filasBorradas = await Profesion.destroy({
             where: { id: req.params.id }

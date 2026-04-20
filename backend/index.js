@@ -4,6 +4,7 @@ const clientesRoutes = require('./routes/cliente.route');
 const institucionesRoutes = require('./routes/institucion.route');
 const profesionesRoutes = require('./routes/profesion.route');
 const usuariosRoutes = require('./routes/usuario.route');
+const authRoutes = require('./routes/auth.route');
 
 // Crear servidor
 const app = express();
@@ -19,6 +20,7 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/instituciones', institucionesRoutes);
 app.use('/api/profesiones', profesionesRoutes);
 app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/auth', authRoutes);
 
 // Configuración general
 const port = 3000;

@@ -5,6 +5,9 @@ const Usuario = require('../models/usuario.model');
 const { ValidationError } = require('sequelize');
 const bcrypt = require('bcrypt');
 
+const authMiddleware = require('../middlewares/auth.middleware');
+const roleMiddleware = require('../middlewares/role.middleware');
+
 const validarReglaUsuario = (rol, cliente_id) => {
     if (rol === 'CLIENTE' && (cliente_id === null || cliente_id === undefined)) {
         return 'Si el rol es CLIENTE, cliente_id es obligatorio';
@@ -22,7 +25,11 @@ const validarReglaUsuario = (rol, cliente_id) => {
 };
 
 // GET /api/usuarios
-router.get('/', async (req, res) => {
+router.get(
+    '/',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
     try {
         const items = await Usuario.findAll({
             attributes: [
@@ -46,9 +53,23 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/usuarios/:id
-router.get('/:id', async (req, res) => {
+router.get(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR', 'CLIENTE'),
+    async (req, res) => {
     try {
-        const item = await Usuario.findByPk(req.params.id, {
+        const id = req.params.id;
+
+        if(req.usuario.rol === 'CLIENTE' && req.usuario.cliente_id != id) {
+            return res.status(403).json(
+                {
+                    message: 'No tenes permiso para acceder a este cliente'
+                }
+            )
+        }
+
+        const item = await Usuario.findByPk(id, {
             attributes: [
                 'id',
                 'email',
@@ -77,7 +98,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/usuarios
-router.post('/', async (req, res) => {
+router.post(
+    '/',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    async (req, res) => {
     try {
         const { email, password, rol, cliente_id, activo } = req.body;
 
@@ -127,7 +152,11 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/usuarios/:id
-router.put('/:id', async (req, res) => {
+router.put(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    async (req, res) => {
     try {
         const item = await Usuario.findByPk(req.params.id);
 
@@ -187,7 +216,11 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/usuarios/:id
-router.delete('/:id', async (req, res) => {
+router.delete(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN'),
+    async (req, res) => {
     try {
         const filasBorradas = await Usuario.destroy({
             where: { id: req.params.id }

@@ -4,8 +4,15 @@ const router = express.Router();
 const Cliente = require('../models/cliente.model');
 const { ValidationError } = require('sequelize');
 
+const authMiddleware = require('../middlewares/auth.middleware');
+const roleMiddleware = require('../middlewares/role.middleware');
+
 // GET /api/clientes
-router.get('/', async (req, res) => {
+router.get(
+    '/',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
     try {
         const items = await Cliente.findAll({
             attributes: [
@@ -30,7 +37,11 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/clientes/:id
-router.get('/:id', async (req, res) => {
+router.get(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR', 'CLIENTE'),
+    async (req, res) => {
     try {
         const item = await Cliente.findOne({
             attributes: [
@@ -63,7 +74,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/clientes
-router.post('/', async (req, res) => {
+router.post(
+    '/',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
     try {
         const item = await Cliente.create({
             nombre: req.body.nombre,
@@ -96,7 +111,11 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/clientes/:id
-router.put('/:id', async (req, res) => {
+router.put(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR', 'CLIENTE'),
+    async (req, res) => {
     try {
         const item = await Cliente.findOne({
             attributes: [
@@ -149,7 +168,11 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/clientes/:id
-router.delete('/:id', async (req, res) => {
+router.delete(
+    '/:id',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
     try {
         const filasBorradas = await Cliente.destroy({
             where: { id: req.params.id }

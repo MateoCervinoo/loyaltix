@@ -7,6 +7,7 @@ const usuariosRoutes = require('./routes/usuario.route');
 const authRoutes = require('./routes/auth.route');
 const puntosRoutes = require('./routes/puntos.route');
 const configuracionPuntosRoutes = require('./routes/configuracionPuntos.route');
+const beneficioRoutes = require('./routes/beneficio.route');
 
 // Crear servidor
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/puntos', puntosRoutes);
 app.use('/api/configuracion-puntos', configuracionPuntosRoutes);
+app.use('/api/beneficios', beneficioRoutes);
 
 // Configuración general
 const port = 3000;

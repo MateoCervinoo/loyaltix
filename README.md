@@ -16,3 +16,13 @@ Backend de sistema de fidelización de clientes.
    npm install
 4. Levantar servidor:
    npm run dev
+
+## Permisos
+ADMIN
+- Permisos para hacer todo
+VENDEDOR
+- Permiso para buscar, crear y modificar clientes
+- Permiso para buscar instituciones y profesiones
+CLIENTE
+- Permiso para buscar cliente (solo el propio)
+- Permiso para buscar usuario (solo el propio)

@@ -52,6 +52,35 @@ CREATE TABLE usuario (
 );
 
 -- =========================
+-- TABLA: configuracion_puntos
+-- =========================
+CREATE TABLE configuracion_puntos (
+    id BIGSERIAL PRIMARY KEY,
+    monto_base NUMERIC(12,2) NOT NULL,
+    puntos_base INTEGER NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_configuracion_monto_base
+        CHECK (monto_base > 0),
+    CONSTRAINT chk_configuracion_puntos_base
+        CHECK (puntos_base > 0)
+);
+
+-- =========================
+-- TABLA: beneficio
+-- =========================
+CREATE TABLE beneficio (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    descripcion VARCHAR(255),
+    puntos_requeridos INTEGER NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_beneficio_puntos
+        CHECK (puntos_requeridos > 0)
+);
+
+-- =========================
 -- TABLA: movimiento_puntos
 -- =========================
 CREATE TABLE movimiento_puntos (
@@ -62,14 +91,34 @@ CREATE TABLE movimiento_puntos (
     descripcion VARCHAR(255),
     fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     creado_por BIGINT NULL,
+
+    -- Para cargas
+    monto_compra NUMERIC(12,2) NULL,
+    configuracion_puntos_id BIGINT NULL,
+
+    -- Para canjes
+    beneficio_id BIGINT NULL,
+
     CONSTRAINT fk_movimiento_cliente
         FOREIGN KEY (cliente_id) REFERENCES cliente(id),
+
     CONSTRAINT fk_movimiento_creado_por
         FOREIGN KEY (creado_por) REFERENCES usuario(id),
+
+    CONSTRAINT fk_movimiento_configuracion
+        FOREIGN KEY (configuracion_puntos_id) REFERENCES configuracion_puntos(id),
+
+    CONSTRAINT fk_movimiento_beneficio
+        FOREIGN KEY (beneficio_id) REFERENCES beneficio(id),
+
     CONSTRAINT chk_tipo_movimiento
         CHECK (tipo IN ('CARGA', 'CANJE', 'AJUSTE', 'BONIFICACION', 'VENCIMIENTO')),
+
     CONSTRAINT chk_cantidad_no_cero
-        CHECK (cantidad <> 0)
+        CHECK (cantidad <> 0),
+
+    CONSTRAINT chk_monto_compra_positivo
+        CHECK (monto_compra IS NULL OR monto_compra > 0)
 );
 
 -- =========================
@@ -77,7 +126,15 @@ CREATE TABLE movimiento_puntos (
 -- =========================
 CREATE INDEX idx_cliente_profesion ON cliente(profesion_id);
 CREATE INDEX idx_cliente_institucion ON cliente(institucion_id);
+
 CREATE INDEX idx_usuario_cliente ON usuario(cliente_id);
+
 CREATE INDEX idx_movimiento_cliente ON movimiento_puntos(cliente_id);
 CREATE INDEX idx_movimiento_creado_por ON movimiento_puntos(creado_por);
 CREATE INDEX idx_movimiento_fecha ON movimiento_puntos(fecha);
+CREATE INDEX idx_movimiento_tipo ON movimiento_puntos(tipo);
+CREATE INDEX idx_movimiento_configuracion ON movimiento_puntos(configuracion_puntos_id);
+CREATE INDEX idx_movimiento_beneficio ON movimiento_puntos(beneficio_id);
+
+CREATE INDEX idx_beneficio_activo ON beneficio(activo);
+CREATE INDEX idx_configuracion_activo ON configuracion_puntos(activo);

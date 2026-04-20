@@ -5,6 +5,8 @@ const institucionesRoutes = require('./routes/institucion.route');
 const profesionesRoutes = require('./routes/profesion.route');
 const usuariosRoutes = require('./routes/usuario.route');
 const authRoutes = require('./routes/auth.route');
+const puntosRoutes = require('./routes/puntos.route');
+const configuracionPuntosRoutes = require('./routes/configuracionPuntos.route');
 
 // Crear servidor
 const app = express();
@@ -21,6 +23,8 @@ app.use('/api/instituciones', institucionesRoutes);
 app.use('/api/profesiones', profesionesRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/puntos', puntosRoutes);
+app.use('/api/configuracion-puntos', configuracionPuntosRoutes);
 
 // Configuración general
 const port = 3000;

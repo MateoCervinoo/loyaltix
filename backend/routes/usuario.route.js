@@ -3,6 +3,23 @@ const router = express.Router();
 
 const Usuario = require('../models/usuario.model');
 const { ValidationError } = require('sequelize');
+const bcrypt = require('bcrypt');
+
+const validarReglaUsuario = (rol, cliente_id) => {
+    if (rol === 'CLIENTE' && (cliente_id === null || cliente_id === undefined)) {
+        return 'Si el rol es CLIENTE, cliente_id es obligatorio';
+    }
+
+    if (
+        (rol === 'ADMIN' || rol === 'VENDEDOR') &&
+        cliente_id !== null &&
+        cliente_id !== undefined
+    ) {
+        return 'Si el rol es ADMIN o VENDEDOR, cliente_id debe ser null';
+    }
+
+    return null;
+};
 
 // GET /api/usuarios
 router.get('/', async (req, res) => {
@@ -62,12 +79,24 @@ router.get('/:id', async (req, res) => {
 // POST /api/usuarios
 router.post('/', async (req, res) => {
     try {
+        const { email, password, rol, cliente_id, activo } = req.body;
+
+        const errorRegla = validarReglaUsuario(rol, cliente_id);
+        if (errorRegla) {
+            return res.status(400).json({
+                codigo: 5.11,
+                message: errorRegla
+            });
+        }
+
+        const passwordHasheada = await bcrypt.hash(password, 10);
+
         const item = await Usuario.create({
-            email: req.body.email,
-            password_hash: req.body.password_hash,
-            rol: req.body.rol,
-            cliente_id: req.body.cliente_id,
-            activo: req.body.activo
+            email: email,
+            password_hash: passwordHasheada,
+            rol: rol,
+            cliente_id: cliente_id,
+            activo: activo
         });
 
         res.status(201).json({
@@ -109,11 +138,24 @@ router.put('/:id', async (req, res) => {
             });
         }
 
-        item.email = req.body.email;
-        item.password_hash = req.body.password_hash;
-        item.rol = req.body.rol;
-        item.cliente_id = req.body.cliente_id;
-        item.activo = req.body.activo;
+        const { email, password, rol, cliente_id, activo } = req.body;
+
+        const errorRegla = validarReglaUsuario(rol, cliente_id);
+        if (errorRegla) {
+            return res.status(400).json({
+                codigo: 5.12,
+                message: errorRegla
+            });
+        }
+
+        item.email = email;
+        item.rol = rol;
+        item.cliente_id = cliente_id;
+        item.activo = activo;
+
+        if (password) {
+            item.password_hash = await bcrypt.hash(password, 10);
+        }
 
         await item.save();
 

@@ -123,12 +123,45 @@ CREATE TABLE movimiento_puntos (
 );
 
 -- =========================
+-- TABLA: canje
+-- =========================
+CREATE TABLE canje (
+    id BIGSERIAL PRIMARY KEY,
+    cliente_id BIGINT NOT NULL,
+    beneficio_id BIGINT NOT NULL,
+    movimiento_puntos_id BIGINT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_utilizacion TIMESTAMP NULL,
+    utilizado_por BIGINT NULL,
+
+    CONSTRAINT fk_canje_cliente
+        FOREIGN KEY (cliente_id) REFERENCES cliente(id),
+
+    CONSTRAINT fk_canje_beneficio
+        FOREIGN KEY (beneficio_id) REFERENCES beneficio(id),
+
+    CONSTRAINT fk_canje_movimiento
+        FOREIGN KEY (movimiento_puntos_id) REFERENCES movimiento_puntos(id),
+
+    CONSTRAINT fk_canje_utilizado_por
+        FOREIGN KEY (utilizado_por) REFERENCES usuario(id),
+
+    CONSTRAINT chk_canje_estado
+        CHECK (estado IN ('PENDIENTE', 'UTILIZADO', 'CANCELADO'))
+);
+
+-- =========================
 -- ÍNDICES
 -- =========================
 CREATE INDEX idx_cliente_profesion ON cliente(profesion_id);
 CREATE INDEX idx_cliente_institucion ON cliente(institucion_id);
 
 CREATE INDEX idx_usuario_cliente ON usuario(cliente_id);
+
+CREATE UNIQUE INDEX uq_usuario_cliente_unico
+ON usuario (cliente_id)
+WHERE rol = 'CLIENTE' AND cliente_id IS NOT NULL;
 
 CREATE INDEX idx_movimiento_cliente ON movimiento_puntos(cliente_id);
 CREATE INDEX idx_movimiento_creado_por ON movimiento_puntos(creado_por);
@@ -139,3 +172,9 @@ CREATE INDEX idx_movimiento_beneficio ON movimiento_puntos(beneficio_id);
 
 CREATE INDEX idx_beneficio_activo ON beneficio(activo);
 CREATE INDEX idx_configuracion_activo ON configuracion_puntos(activo);
+
+CREATE INDEX idx_canje_cliente ON canje(cliente_id);
+CREATE INDEX idx_canje_beneficio ON canje(beneficio_id);
+CREATE INDEX idx_canje_estado ON canje(estado);
+CREATE INDEX idx_canje_fecha_creacion ON canje(fecha_creacion);
+CREATE INDEX idx_canje_movimiento ON canje(movimiento_puntos_id);

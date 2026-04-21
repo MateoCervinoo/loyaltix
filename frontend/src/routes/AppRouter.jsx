@@ -14,6 +14,7 @@ import ConfiguracionPuntosPage from '../pages/admin/ConfiguracionPuntosPage';
 import UsuariosPage from '../pages/admin/UsuariosPage';
 import InstitucionesPage from '../pages/admin/InstitucionesPage';
 import ProfesionesPage from '../pages/admin/ProfesionesPage';
+import CanjesPendientesPage from '../pages/admin/CanjesPendientesPage';
 
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../auth/useAuth';
@@ -65,6 +66,7 @@ function AppRouter() {
             <Route path="/beneficios-admin" element={<BeneficiosPage />} />
             <Route path="/puntos-admin" element={<PuntosPage />} />
             <Route path="/configuracion-puntos-admin" element={<ConfiguracionPuntosPage />} />
+            <Route path="/canjes-admin" element={<CanjesPendientesPage />} />
         </Route>
 
         <Route

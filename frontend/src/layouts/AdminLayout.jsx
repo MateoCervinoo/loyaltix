@@ -43,6 +43,9 @@ function AdminLayout() {
             <Link className="btn btn-outline-secondary text-start" to="/puntos-admin">
                 Puntos
             </Link>
+            <Link className="btn btn-outline-secondary text-start" to="/canjes-admin">
+            Canjes
+            </Link>
             {usuario?.rol === 'ADMIN' && (
                 <Link className="btn btn-outline-secondary text-start" to="/configuracion-puntos-admin">
                     Configuración de puntos

@@ -28,6 +28,11 @@ function AdminLayout() {
             <Link className="btn btn-outline-secondary text-start" to="/puntos-admin">
                 Puntos
             </Link>
+            {usuario?.rol === 'ADMIN' && (
+                <Link className="btn btn-outline-secondary text-start" to="/configuracion-puntos-admin">
+                    Configuración de puntos
+                </Link>
+            )}
             </nav>
 
             <hr />

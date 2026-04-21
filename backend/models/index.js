@@ -6,6 +6,7 @@ const MovimientoPuntos = require('./movimientoPuntos.model');
 const MovimientoPuntos = require('./movimientoPuntos.model');
 const ConfiguracionPuntos = require('./configuracionPuntos.model');
 const Beneficio = require('./beneficio.model');
+const Canje = require('./canje.model');
 
 // Relaciones
 Cliente.belongsTo(Institucion, { foreignKey: 'institucion_id' });
@@ -18,6 +19,11 @@ MovimientoPuntos.belongsTo(Usuario, { foreignKey: 'creado_por' });
 MovimientoPuntos.belongsTo(ConfiguracionPuntos, { foreignKey: 'configuracion_puntos_id' });
 MovimientoPuntos.belongsTo(Beneficio, { foreignKey: 'beneficio_id' });
 
+Canje.belongsTo(Cliente, { foreignKey: 'cliente_id' });
+Canje.belongsTo(Beneficio, { foreignKey: 'beneficio_id' });
+Canje.belongsTo(MovimientoPuntos, { foreignKey: 'movimiento_puntos_id' });
+Canje.belongsTo(Usuario, { foreignKey: 'utilizado_por' });
+
 module.exports = {
     Cliente,
     Usuario,
@@ -26,4 +32,5 @@ module.exports = {
     MovimientoPuntos,
     ConfiguracionPuntos,
     Beneficio,
+    Canje,
 };

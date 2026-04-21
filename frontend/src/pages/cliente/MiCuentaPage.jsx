@@ -2,34 +2,41 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../../api/axios';
 import BeneficioDetalleModal from '../../components/BeneficioDetalleModal';
 import HistorialCompletoModal from '../../components/HistorialCompletoModal';
+import MisCanjesCard from '../../components/MisCanjesCard';
+import MisCanjesModal from '../../components/MisCanjesModal';
 
 function MiCuentaPage() {
     const [saldo, setSaldo] = useState(0);
     const [historial, setHistorial] = useState([]);
     const [beneficios, setBeneficios] = useState([]);
+    const [canjes, setCanjes] = useState([]);
 
     const [beneficioSeleccionado, setBeneficioSeleccionado] = useState(null);
     const [showBeneficioModal, setShowBeneficioModal] = useState(false);
 
     const [showHistorialModal, setShowHistorialModal] = useState(false);
+    const [showCanjesModal, setShowCanjesModal] = useState(false);
 
     const [loadingSaldo, setLoadingSaldo] = useState(true);
     const [loadingHistorial, setLoadingHistorial] = useState(true);
     const [loadingBeneficios, setLoadingBeneficios] = useState(true);
+    const [loadingCanjes, setLoadingCanjes] = useState(true);
 
     const [error, setError] = useState('');
     const [mensaje, setMensaje] = useState('');
 
     const fetchDatos = async () => {
-        const [saldoRes, historialRes, beneficiosRes] = await Promise.all([
+        const [saldoRes, historialRes, beneficiosRes, canjesRes] = await Promise.all([
         api.get('/puntos/mis-puntos'),
         api.get('/puntos/mi-historial'),
         api.get('/beneficios'),
+        api.get('/canjes/mis-canjes'),
         ]);
 
         setSaldo(saldoRes.data.saldo || 0);
         setHistorial(historialRes.data || []);
         setBeneficios(beneficiosRes.data || []);
+        setCanjes(canjesRes.data || []);
     };
 
     const recargarDatos = async () => {
@@ -39,6 +46,7 @@ function MiCuentaPage() {
         setLoadingSaldo(true);
         setLoadingHistorial(true);
         setLoadingBeneficios(true);
+        setLoadingCanjes(true);
 
         await fetchDatos();
         } catch (err) {
@@ -48,6 +56,7 @@ function MiCuentaPage() {
         setLoadingSaldo(false);
         setLoadingHistorial(false);
         setLoadingBeneficios(false);
+        setLoadingCanjes(false);
         }
     };
 
@@ -64,6 +73,7 @@ function MiCuentaPage() {
             setLoadingSaldo(false);
             setLoadingHistorial(false);
             setLoadingBeneficios(false);
+            setLoadingCanjes(false);
         }
         };
 
@@ -83,19 +93,18 @@ function MiCuentaPage() {
     };
 
     const handleCanjear = async (beneficioId) => {
-        const confirmar = window.confirm('¿Querés canjear este beneficio?');
+        const confirmar = window.confirm('¿Querés generar este canje?');
         if (!confirmar) return;
 
         try {
         setError('');
         setMensaje('');
 
-        await api.post('/puntos/canjear', {
+        const res = await api.post('/canjes', {
             beneficio_id: beneficioId,
-            descripcion: 'Canje realizado desde frontend',
         });
 
-        setMensaje('Canje realizado correctamente');
+        setMensaje(`Canje generado correctamente. Código: ${res.data.canje.codigo}`);
         handleCloseBeneficio();
         await recargarDatos();
         } catch (err) {
@@ -182,6 +191,16 @@ function MiCuentaPage() {
             </div>
         </div>
 
+        <div className="row g-4 mb-4">
+            <div className="col-lg-12">
+            <MisCanjesCard
+                canjes={canjes}
+                loading={loadingCanjes}
+                onVerTodos={() => setShowCanjesModal(true)}
+            />
+            </div>
+        </div>
+
         <div className="card shadow-sm">
             <div className="card-body">
             <h5 className="card-title mb-3">Beneficios disponibles</h5>
@@ -234,6 +253,12 @@ function MiCuentaPage() {
             show={showHistorialModal}
             historial={historial}
             onClose={() => setShowHistorialModal(false)}
+        />
+
+        <MisCanjesModal
+            show={showCanjesModal}
+            canjes={canjes}
+            onClose={() => setShowCanjesModal(false)}
         />
         </div>
     );

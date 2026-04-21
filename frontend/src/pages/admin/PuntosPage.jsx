@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
+import ClienteSelectorModal from '../../components/ClienteSelectorModal';
 
 function PuntosPage() {
     const { usuario } = useAuth();
 
     const [clienteId, setClienteId] = useState('');
+    const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+    const [showClienteModal, setShowClienteModal] = useState(false);
+
     const [saldo, setSaldo] = useState(null);
     const [historial, setHistorial] = useState([]);
 
@@ -46,11 +50,17 @@ function PuntosPage() {
         e.preventDefault();
 
         if (!clienteId) {
-        setError('Debés ingresar un cliente_id');
+        setError('Debés seleccionar un cliente');
         return;
         }
 
         await buscarDatosCliente();
+    };
+
+    const handleSelectCliente = (cliente) => {
+        setClienteId(cliente.id);
+        setClienteSeleccionado(cliente);
+        setShowClienteModal(false);
     };
 
     const handleCargarPuntos = async (e) => {
@@ -112,19 +122,34 @@ function PuntosPage() {
 
             <form onSubmit={handleBuscar}>
                 <div className="row g-3 align-items-end">
-                <div className="col-md-4">
-                    <label className="form-label">Cliente ID</label>
+                <div className="col-md-5">
+                    <label className="form-label">Cliente</label>
+                    <div className="input-group">
                     <input
-                    type="number"
-                    className="form-control"
-                    value={clienteId}
-                    onChange={(e) => setClienteId(e.target.value)}
-                    min="1"
+                        type="text"
+                        className="form-control"
+                        value={
+                        clienteSeleccionado
+                            ? `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido} (ID: ${clienteSeleccionado.id})`
+                            : clienteId
+                            ? `Cliente ID: ${clienteId}`
+                            : ''
+                        }
+                        readOnly
+                        placeholder="Seleccionar cliente"
                     />
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => setShowClienteModal(true)}
+                    >
+                        Buscar
+                    </button>
+                    </div>
                 </div>
 
                 <div className="col-md-3">
-                    <button className="btn btn-primary" type="submit" disabled={loading}>
+                    <button className="btn btn-primary" type="submit" disabled={loading || !clienteId}>
                     {loading ? 'Buscando...' : 'Buscar saldo e historial'}
                     </button>
                 </div>
@@ -260,6 +285,12 @@ function PuntosPage() {
             )}
             </div>
         </div>
+
+        <ClienteSelectorModal
+            show={showClienteModal}
+            onClose={() => setShowClienteModal(false)}
+            onSelect={handleSelectCliente}
+        />
         </div>
     );
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import FormLabel from '../../components/FormLabel';
+import BackToDashboard from '../../components/BackToDashboard';
 
 const initialForm = {
     nombre: '',
@@ -95,6 +97,7 @@ function InstitucionesPage() {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Instituciones</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -109,8 +112,9 @@ function InstitucionesPage() {
             <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                 <div className="col-md-4">
-                    <label className="form-label">Nombre</label>
+                    <FormLabel htmlFor="nombre" required>Nombre</FormLabel>
                     <input
+                    id="nombre"
                     type="text"
                     name="nombre"
                     className="form-control"
@@ -121,8 +125,9 @@ function InstitucionesPage() {
                 </div>
 
                 <div className="col-md-4">
-                    <label className="form-label">Dirección</label>
+                    <FormLabel htmlFor="direccion">Dirección</FormLabel>
                     <input
+                    id="direccion"
                     type="text"
                     name="direccion"
                     className="form-control"
@@ -132,8 +137,9 @@ function InstitucionesPage() {
                 </div>
 
                 <div className="col-md-4">
-                    <label className="form-label">Teléfono</label>
+                    <FormLabel htmlFor="telefono">Teléfono</FormLabel>
                     <input
+                    id="telefono"
                     type="text"
                     name="telefono"
                     className="form-control"

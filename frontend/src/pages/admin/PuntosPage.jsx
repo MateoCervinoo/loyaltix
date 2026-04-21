@@ -2,6 +2,8 @@ import { useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
 import ClienteSelectorModal from '../../components/ClienteSelectorModal';
+import FormLabel from '../../components/FormLabel';
+import BackToDashboard from '../../components/BackToDashboard';
 
 function PuntosPage() {
     const { usuario } = useAuth();
@@ -66,6 +68,9 @@ function PuntosPage() {
     const handleCargarPuntos = async (e) => {
         e.preventDefault();
 
+        const confirmar = window.confirm('¿Confirmás la carga de puntos?');
+        if (!confirmar) return;
+
         try {
         setError('');
         setMensaje('');
@@ -89,6 +94,9 @@ function PuntosPage() {
     const handleAjuste = async (e) => {
         e.preventDefault();
 
+        const confirmar = window.confirm('¿Querés aplicar este ajuste manual?');
+        if (!confirmar) return;
+
         try {
         setError('');
         setMensaje('');
@@ -111,6 +119,7 @@ function PuntosPage() {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Puntos</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -123,9 +132,10 @@ function PuntosPage() {
             <form onSubmit={handleBuscar}>
                 <div className="row g-3 align-items-end">
                 <div className="col-md-5">
-                    <label className="form-label">Cliente</label>
+                    <FormLabel htmlFor="cliente-selector" required>Cliente</FormLabel>
                     <div className="input-group">
                     <input
+                        id="cliente-selector"
                         type="text"
                         className="form-control"
                         value={
@@ -166,8 +176,9 @@ function PuntosPage() {
                 <form onSubmit={handleCargarPuntos}>
                 <div className="row g-3">
                     <div className="col-md-4">
-                    <label className="form-label">Monto de compra</label>
+                    <FormLabel htmlFor="montoCompra" required>Monto de compra</FormLabel>
                     <input
+                        id="montoCompra"
                         type="number"
                         className="form-control"
                         value={montoCompra}
@@ -178,8 +189,9 @@ function PuntosPage() {
                     </div>
 
                     <div className="col-md-8">
-                    <label className="form-label">Descripción</label>
+                    <FormLabel htmlFor="descripcionCarga">Descripción</FormLabel>
                     <input
+                        id="descripcionCarga"
                         type="text"
                         className="form-control"
                         value={descripcionCarga}
@@ -208,8 +220,9 @@ function PuntosPage() {
                 <form onSubmit={handleAjuste}>
                 <div className="row g-3">
                     <div className="col-md-4">
-                    <label className="form-label">Cantidad de ajuste</label>
+                    <FormLabel htmlFor="cantidadAjuste" required>Cantidad de ajuste</FormLabel>
                     <input
+                        id="cantidadAjuste"
                         type="number"
                         className="form-control"
                         value={cantidadAjuste}
@@ -222,8 +235,9 @@ function PuntosPage() {
                     </div>
 
                     <div className="col-md-8">
-                    <label className="form-label">Descripción</label>
+                    <FormLabel htmlFor="descripcionAjuste">Descripción</FormLabel>
                     <input
+                        id="descripcionAjuste"
                         type="text"
                         className="form-control"
                         value={descripcionAjuste}

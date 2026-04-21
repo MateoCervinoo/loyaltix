@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
+import FormLabel from '../../components/FormLabel';
+import BackToDashboard from '../../components/BackToDashboard';
 
 const initialForm = {
     nombre: '',
@@ -126,6 +128,7 @@ function BeneficiosPage() {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Beneficios</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -140,8 +143,9 @@ function BeneficiosPage() {
 
                 <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label className="form-label">Nombre</label>
+                    <FormLabel htmlFor="nombre" required>Nombre</FormLabel>
                     <input
+                    id="nombre"
                     type="text"
                     name="nombre"
                     className="form-control"
@@ -152,8 +156,9 @@ function BeneficiosPage() {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Descripción</label>
+                    <FormLabel htmlFor="descripcion">Descripción</FormLabel>
                     <input
+                    id="descripcion"
                     type="text"
                     name="descripcion"
                     className="form-control"
@@ -163,8 +168,9 @@ function BeneficiosPage() {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">URL de imagen</label>
+                    <FormLabel htmlFor="imagen_url">URL de imagen</FormLabel>
                     <input
+                    id="imagen_url"
                     type="text"
                     name="imagen_url"
                     className="form-control"
@@ -175,8 +181,9 @@ function BeneficiosPage() {
                 </div>
 
                 <div className="mb-3">
-                    <label className="form-label">Puntos requeridos</label>
+                    <FormLabel htmlFor="puntos_requeridos" required>Puntos requeridos</FormLabel>
                     <input
+                    id="puntos_requeridos"
                     type="number"
                     name="puntos_requeridos"
                     className="form-control"

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import ClienteSelectorModal from '../../components/ClienteSelectorModal';
+import FormLabel from '../../components/FormLabel';
+import BackToDashboard from '../../components/BackToDashboard';
 
 const initialForm = {
     email: '',
@@ -149,6 +151,7 @@ function UsuariosPage() {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Usuarios</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -163,8 +166,9 @@ function UsuariosPage() {
             <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                 <div className="col-md-6">
-                    <label className="form-label">Email</label>
+                    <FormLabel htmlFor="email" required>Email</FormLabel>
                     <input
+                    id="email"
                     type="email"
                     name="email"
                     className="form-control"
@@ -175,10 +179,11 @@ function UsuariosPage() {
                 </div>
 
                 <div className="col-md-6">
-                    <label className="form-label">
-                    {editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}
-                    </label>
+                    <FormLabel htmlFor="password" required={!editingId}>
+                    {editingId ? 'Nueva contraseña' : 'Contraseña'}
+                    </FormLabel>
                     <input
+                    id="password"
                     type="password"
                     name="password"
                     className="form-control"
@@ -189,8 +194,9 @@ function UsuariosPage() {
                 </div>
 
                 <div className="col-md-4">
-                    <label className="form-label">Rol</label>
+                    <FormLabel htmlFor="rol" required>Rol</FormLabel>
                     <select
+                    id="rol"
                     name="rol"
                     className="form-select"
                     value={form.rol}
@@ -204,9 +210,12 @@ function UsuariosPage() {
                 </div>
 
                 <div className="col-md-4">
-                    <label className="form-label">Cliente ID</label>
+                    <FormLabel htmlFor="cliente_id" required={form.rol === 'CLIENTE'}>
+                    Cliente ID
+                    </FormLabel>
                     <div className="input-group">
                     <input
+                        id="cliente_id"
                         type="number"
                         name="cliente_id"
                         className="form-control"

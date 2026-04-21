@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/useAuth';
 const initialForm = {
     nombre: '',
     descripcion: '',
+    imagen_url: '',
     puntos_requeridos: '',
     activo: true,
 };
@@ -65,6 +66,7 @@ function BeneficiosPage() {
         setForm({
         nombre: beneficio.nombre,
         descripcion: beneficio.descripcion || '',
+        imagen_url: beneficio.imagen_url || '',
         puntos_requeridos: beneficio.puntos_requeridos,
         activo: beneficio.activo,
         });
@@ -106,6 +108,9 @@ function BeneficiosPage() {
     };
 
     const handleToggle = async (id) => {
+        const confirmar = window.confirm('¿Querés cambiar el estado de este beneficio?');
+        if (!confirmar) return;
+
         try {
         setError('');
         setMensaje('');
@@ -154,6 +159,18 @@ function BeneficiosPage() {
                     className="form-control"
                     value={form.descripcion}
                     onChange={handleChange}
+                    />
+                </div>
+
+                <div className="mb-3">
+                    <label className="form-label">URL de imagen</label>
+                    <input
+                    type="text"
+                    name="imagen_url"
+                    className="form-control"
+                    value={form.imagen_url}
+                    onChange={handleChange}
+                    placeholder="https://..."
                     />
                 </div>
 
@@ -217,6 +234,7 @@ function BeneficiosPage() {
                 <table className="table align-middle">
                     <thead>
                     <tr>
+                        <th>Imagen</th>
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Puntos</th>
@@ -227,6 +245,22 @@ function BeneficiosPage() {
                     <tbody>
                     {beneficios.map((beneficio) => (
                         <tr key={beneficio.id}>
+                        <td>
+                            {beneficio.imagen_url ? (
+                            <img
+                                src={beneficio.imagen_url}
+                                alt={beneficio.nombre}
+                                style={{
+                                width: '60px',
+                                height: '60px',
+                                objectFit: 'cover',
+                                borderRadius: '8px',
+                                }}
+                            />
+                            ) : (
+                            '-'
+                            )}
+                        </td>
                         <td>{beneficio.nombre}</td>
                         <td>{beneficio.descripcion}</td>
                         <td>{beneficio.puntos_requeridos}</td>

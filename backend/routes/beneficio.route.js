@@ -27,6 +27,7 @@ router.get(
                     'id',
                     'nombre',
                     'descripcion',
+                    'imagen_url',
                     'puntos_requeridos',
                     'activo',
                     'fecha_creacion'
@@ -65,6 +66,7 @@ router.get(
                     'id',
                     'nombre',
                     'descripcion',
+                    'imagen_url',
                     'puntos_requeridos',
                     'activo',
                     'fecha_creacion'
@@ -99,6 +101,7 @@ router.post(
             const item = await Beneficio.create({
                 nombre: req.body.nombre,
                 descripcion: req.body.descripcion,
+                imagen_url: req.body.imagen_url,
                 puntos_requeridos: req.body.puntos_requeridos,
                 activo: req.body.activo
             });
@@ -144,6 +147,7 @@ router.put(
 
             item.nombre = req.body.nombre;
             item.descripcion = req.body.descripcion;
+            item.imagen_url = req.body.imagen_url;
             item.puntos_requeridos = req.body.puntos_requeridos;
             item.activo = req.body.activo;
 

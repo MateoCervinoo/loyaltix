@@ -13,24 +13,27 @@ function MiCuentaPage() {
     const [error, setError] = useState('');
     const [mensaje, setMensaje] = useState('');
 
-    const cargarDatos = async () => {
-        try {
-        setError('');
-        setMensaje('');
-
-        setLoadingSaldo(true);
-        setLoadingHistorial(true);
-        setLoadingBeneficios(true);
-
+    const fetchDatos = async () => {
         const [saldoRes, historialRes, beneficiosRes] = await Promise.all([
-            api.get('/puntos/mis-puntos'),
-            api.get('/puntos/mi-historial'),
-            api.get('/beneficios'),
+        api.get('/puntos/mis-puntos'),
+        api.get('/puntos/mi-historial'),
+        api.get('/beneficios'),
         ]);
 
         setSaldo(saldoRes.data.saldo || 0);
         setHistorial(historialRes.data || []);
         setBeneficios(beneficiosRes.data || []);
+    };
+
+    const recargarDatos = async () => {
+        try {
+        setError('');
+        setMensaje('');
+        setLoadingSaldo(true);
+        setLoadingHistorial(true);
+        setLoadingBeneficios(true);
+
+        await fetchDatos();
         } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || 'No se pudieron cargar los datos');
@@ -42,7 +45,22 @@ function MiCuentaPage() {
     };
 
     useEffect(() => {
-        cargarDatos();
+        const loadInitialData = async () => {
+        try {
+            setError('');
+            setMensaje('');
+            await fetchDatos();
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+        } finally {
+            setLoadingSaldo(false);
+            setLoadingHistorial(false);
+            setLoadingBeneficios(false);
+        }
+        };
+
+        loadInitialData();
     }, []);
 
     const handleCanjear = async (beneficioId) => {
@@ -56,7 +74,7 @@ function MiCuentaPage() {
         });
 
         setMensaje('Canje realizado correctamente');
-        await cargarDatos();
+        await recargarDatos();
         } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || 'No se pudo realizar el canje');

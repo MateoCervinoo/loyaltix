@@ -4,7 +4,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const Usuario = require('../models/usuario.model');
+const { Usuario, Cliente } = require('../models');
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -21,7 +21,13 @@ router.post('/login', async (req, res) => {
 
         // Buscar usuario
         const usuario = await Usuario.findOne({
-            where: { email: email }
+        where: { email },
+        include: [
+            {
+            model: Cliente,
+            attributes: ['nombre', 'apellido'],
+            },
+        ],
         });
 
         if (!usuario) {
@@ -72,7 +78,9 @@ router.post('/login', async (req, res) => {
                 email: usuario.email,
                 rol: usuario.rol,
                 cliente_id: usuario.cliente_id,
-                activo: usuario.activo
+                activo: usuario.activo,
+                nombre: usuario.Cliente?.nombre || null,
+                apellido: usuario.Cliente?.apellido || null,
             }
         });
 

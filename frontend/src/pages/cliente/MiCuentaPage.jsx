@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import BeneficioDetalleModal from '../../components/BeneficioDetalleModal';
 
 function MiCuentaPage() {
     const [saldo, setSaldo] = useState(0);
     const [historial, setHistorial] = useState([]);
     const [beneficios, setBeneficios] = useState([]);
+
+    const [beneficioSeleccionado, setBeneficioSeleccionado] = useState(null);
+    const [showBeneficioModal, setShowBeneficioModal] = useState(false);
 
     const [loadingSaldo, setLoadingSaldo] = useState(true);
     const [loadingHistorial, setLoadingHistorial] = useState(true);
@@ -63,7 +67,20 @@ function MiCuentaPage() {
         loadInitialData();
     }, []);
 
+    const handleOpenBeneficio = (beneficio) => {
+        setBeneficioSeleccionado(beneficio);
+        setShowBeneficioModal(true);
+    };
+
+    const handleCloseBeneficio = () => {
+        setBeneficioSeleccionado(null);
+        setShowBeneficioModal(false);
+    };
+
     const handleCanjear = async (beneficioId) => {
+        const confirmar = window.confirm('¿Querés canjear este beneficio?');
+        if (!confirmar) return;
+
         try {
         setError('');
         setMensaje('');
@@ -74,6 +91,7 @@ function MiCuentaPage() {
         });
 
         setMensaje('Canje realizado correctamente');
+        handleCloseBeneficio();
         await recargarDatos();
         } catch (err) {
         console.error(err);
@@ -160,28 +178,30 @@ function MiCuentaPage() {
                 ) : beneficios.length === 0 ? (
                     <p className="text-muted mb-0">No hay beneficios disponibles.</p>
                 ) : (
-                    <div className="d-flex flex-column gap-3">
+                    <div className="row g-3">
                     {beneficios.map((beneficio) => (
-                        <div key={beneficio.id} className="border rounded p-3">
-                        <h6 className="mb-1">{beneficio.nombre}</h6>
-                        <p className="mb-2 text-muted">{beneficio.descripcion}</p>
-                        <p className="mb-2">
-                            <strong>{beneficio.puntos_requeridos}</strong> puntos
-                        </p>
-
-                        <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleCanjear(beneficio.id)}
-                            disabled={saldo < beneficio.puntos_requeridos}
+                        <div key={beneficio.id} className="col-md-6">
+                        <div
+                            className="card h-100 shadow-sm"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleOpenBeneficio(beneficio)}
                         >
-                            Canjear
-                        </button>
+                            {beneficio.imagen_url && (
+                            <img
+                                src={beneficio.imagen_url}
+                                alt={beneficio.nombre}
+                                className="card-img-top"
+                                style={{ height: '180px', objectFit: 'cover' }}
+                            />
+                            )}
 
-                        {saldo < beneficio.puntos_requeridos && (
-                            <div className="form-text text-danger">
-                            No tenés saldo suficiente
+                            <div className="card-body">
+                            <h6 className="card-title">{beneficio.nombre}</h6>
+                            <p className="card-text mb-0">
+                                <strong>{beneficio.puntos_requeridos}</strong> puntos
+                            </p>
                             </div>
-                        )}
+                        </div>
                         </div>
                     ))}
                     </div>
@@ -190,6 +210,14 @@ function MiCuentaPage() {
             </div>
             </div>
         </div>
+
+        <BeneficioDetalleModal
+            show={showBeneficioModal}
+            beneficio={beneficioSeleccionado}
+            saldo={saldo}
+            onClose={handleCloseBeneficio}
+            onCanjear={handleCanjear}
+        />
         </div>
     );
 }

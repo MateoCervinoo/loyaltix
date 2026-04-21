@@ -20,6 +20,10 @@ const Beneficio = sequelize.define('Beneficio', {
         type: DataTypes.STRING(255),
         allowNull: true,
     },
+    imagen_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    },
     puntos_requeridos: {
         type: DataTypes.INTEGER,
         allowNull: false,

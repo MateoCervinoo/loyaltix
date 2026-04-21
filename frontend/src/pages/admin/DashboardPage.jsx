@@ -35,14 +35,11 @@ function DashboardPage() {
 
             const responses = await Promise.allSettled(requests);
 
-            const clientesRes = responses[0];
-            const beneficiosRes = responses[1];
-
             const clientes =
-            clientesRes.status === 'fulfilled' ? clientesRes.value.data || [] : [];
+            responses[0].status === 'fulfilled' ? responses[0].value.data || [] : [];
 
             const beneficios =
-            beneficiosRes.status === 'fulfilled' ? beneficiosRes.value.data || [] : [];
+            responses[1].status === 'fulfilled' ? responses[1].value.data || [] : [];
 
             let usuarios = [];
             let configuracionActiva = null;
@@ -104,7 +101,7 @@ function DashboardPage() {
         ) : (
             <>
             <div className="row g-4 mb-4">
-                <div className="col-lg-4">
+                <div className="col-lg-5">
                 <div className="card shadow-sm h-100">
                     <div className="card-body">
                     <h5 className="card-title mb-3">Accesos rápidos</h5>
@@ -122,6 +119,10 @@ function DashboardPage() {
                         Ir a beneficios
                         </Link>
 
+                        <Link className="btn btn-outline-primary" to="/canjes-admin">
+                        Ir a canjes
+                        </Link>
+
                         {usuario?.rol === 'ADMIN' && (
                         <Link className="btn btn-outline-primary" to="/configuracion-puntos-admin">
                             Ir a configuración de puntos
@@ -132,7 +133,7 @@ function DashboardPage() {
                 </div>
                 </div>
 
-                <div className="col-lg-4">
+                <div className="col-lg-7">
                 <div className="card shadow-sm h-100">
                     <div className="card-body">
                     <h5 className="card-title mb-3">Resumen del sistema</h5>
@@ -159,21 +160,6 @@ function DashboardPage() {
                             : 'Sin configuración activa'}
                         </p>
                     )}
-                    </div>
-                </div>
-                </div>
-
-                <div className="col-lg-4">
-                <div className="card shadow-sm h-100">
-                    <div className="card-body">
-                    <h5 className="card-title mb-3">Usuario actual</h5>
-
-                    <p className="mb-2">
-                        <strong>Email:</strong> {usuario?.email}
-                    </p>
-                    <p className="mb-0">
-                        <strong>Rol:</strong> {usuario?.rol}
-                    </p>
                     </div>
                 </div>
                 </div>

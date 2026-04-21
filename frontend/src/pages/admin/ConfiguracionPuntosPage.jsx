@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
+import FormLabel from '../../components/FormLabel';
+import BackToDashboard from '../../components/BackToDashboard';
 
 const initialForm = {
     monto_base: '',
@@ -105,6 +107,9 @@ function ConfiguracionPuntosPage() {
     };
 
     const handleActivar = async (id) => {
+        const confirmar = window.confirm('¿Querés activar esta configuración?');
+        if (!confirmar) return;
+
         try {
         setError('');
         setMensaje('');
@@ -120,6 +125,7 @@ function ConfiguracionPuntosPage() {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Configuración de puntos</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -135,8 +141,9 @@ function ConfiguracionPuntosPage() {
                 <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                     <div className="col-md-4">
-                    <label className="form-label">Monto base</label>
+                    <FormLabel htmlFor="monto_base" required>Monto base</FormLabel>
                     <input
+                        id="monto_base"
                         type="number"
                         name="monto_base"
                         className="form-control"
@@ -149,8 +156,9 @@ function ConfiguracionPuntosPage() {
                     </div>
 
                     <div className="col-md-4">
-                    <label className="form-label">Puntos base</label>
+                    <FormLabel htmlFor="puntos_base" required>Puntos base</FormLabel>
                     <input
+                        id="puntos_base"
                         type="number"
                         name="puntos_base"
                         className="form-control"

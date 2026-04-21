@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import FormLabel from '../../components/FormLabel';
+import BackToDashboard from '../../components/BackToDashboard';
 
 const initialForm = {
     nombre: '',
@@ -9,7 +11,7 @@ const initialForm = {
     profesion_id: '',
 };
 
-    function ClientesPage() {
+function ClientesPage() {
     const [clientes, setClientes] = useState([]);
     const [instituciones, setInstituciones] = useState([]);
     const [profesiones, setProfesiones] = useState([]);
@@ -128,6 +130,7 @@ const initialForm = {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Clientes</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -142,8 +145,9 @@ const initialForm = {
             <form onSubmit={handleSubmit}>
                 <div className="row g-3">
                 <div className="col-md-6">
-                    <label className="form-label">Nombre</label>
+                    <FormLabel htmlFor="nombre" required>Nombre</FormLabel>
                     <input
+                    id="nombre"
                     type="text"
                     name="nombre"
                     className="form-control"
@@ -154,8 +158,9 @@ const initialForm = {
                 </div>
 
                 <div className="col-md-6">
-                    <label className="form-label">Apellido</label>
+                    <FormLabel htmlFor="apellido" required>Apellido</FormLabel>
                     <input
+                    id="apellido"
                     type="text"
                     name="apellido"
                     className="form-control"
@@ -166,8 +171,9 @@ const initialForm = {
                 </div>
 
                 <div className="col-md-6">
-                    <label className="form-label">Teléfono</label>
+                    <FormLabel htmlFor="telefono" required>Teléfono</FormLabel>
                     <input
+                    id="telefono"
                     type="text"
                     name="telefono"
                     className="form-control"
@@ -178,8 +184,9 @@ const initialForm = {
                 </div>
 
                 <div className="col-md-6">
-                    <label className="form-label">Institución</label>
+                    <FormLabel htmlFor="institucion_id" required>Institución</FormLabel>
                     <select
+                    id="institucion_id"
                     name="institucion_id"
                     className="form-select"
                     value={form.institucion_id}
@@ -196,8 +203,9 @@ const initialForm = {
                 </div>
 
                 <div className="col-md-6">
-                    <label className="form-label">Profesión</label>
+                    <FormLabel htmlFor="profesion_id" required>Profesión</FormLabel>
                     <select
+                    id="profesion_id"
                     name="profesion_id"
                     className="form-select"
                     value={form.profesion_id}

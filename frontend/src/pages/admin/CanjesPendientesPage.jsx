@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
+import BackToDashboard from '../../components/BackToDashboard';
 
 function CanjesPendientesPage() {
     const { usuario } = useAuth();
@@ -66,6 +67,7 @@ function CanjesPendientesPage() {
 
     return (
         <div>
+        <BackToDashboard />
         <h2 className="mb-4">Canjes pendientes</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}

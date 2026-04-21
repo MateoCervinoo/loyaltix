@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../auth/useAuth';
+import FormLabel from '../components/FormLabel';
+import logoMain from '../resources/logo/loyaltix-logo-main.png';
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -43,10 +45,7 @@ function LoginPage() {
         }
         } catch (err) {
         console.error(err);
-
-        setError(
-            err.response?.data?.message || 'No se pudo iniciar sesión'
-        );
+        setError(err.response?.data?.message || 'No se pudo iniciar sesión');
         } finally {
         setLoading(false);
         }
@@ -56,12 +55,20 @@ function LoginPage() {
         <div className="row justify-content-center">
         <div className="col-md-4">
             <div className="card p-4 shadow-sm">
+            <div className="text-center mb-3">
+            <img
+                src={logoMain}
+                alt="LoyalTix"
+                style={{ height: '56px', objectFit: 'contain' }}
+            />
+            </div>
             <h3 className="mb-3">Iniciar sesión</h3>
 
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                <label className="form-label">Email</label>
+                <FormLabel htmlFor="email" required>Email</FormLabel>
                 <input
+                    id="email"
                     type="email"
                     name="email"
                     className="form-control"
@@ -72,8 +79,9 @@ function LoginPage() {
                 </div>
 
                 <div className="mb-3">
-                <label className="form-label">Contraseña</label>
+                <FormLabel htmlFor="password" required>Contraseña</FormLabel>
                 <input
+                    id="password"
                     type="password"
                     name="password"
                     className="form-control"

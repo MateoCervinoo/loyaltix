@@ -22,6 +22,21 @@ function AdminLayout() {
             <Link className="btn btn-outline-secondary text-start" to="/clientes-admin">
                 Clientes
             </Link>
+            {usuario?.rol === 'ADMIN' && (
+            <Link className="btn btn-outline-secondary text-start" to="/usuarios-admin">
+                Usuarios
+                </Link>
+            )}
+            {usuario?.rol === 'ADMIN' && (
+                <Link className="btn btn-outline-secondary text-start" to="/instituciones-admin">
+                Instituciones
+                </Link>
+            )}
+            {usuario?.rol === 'ADMIN' && (
+                <Link className="btn btn-outline-secondary text-start" to="/profesiones-admin">
+                Profesiones
+                </Link>
+            )}
             <Link className="btn btn-outline-secondary text-start" to="/beneficios-admin">
                 Beneficios
             </Link>

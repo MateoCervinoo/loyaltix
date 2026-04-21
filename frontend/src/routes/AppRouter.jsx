@@ -11,6 +11,9 @@ import PuntosPage from '../pages/admin/PuntosPage';
 import MiCuentaPage from '../pages/cliente/MiCuentaPage';
 import ClientesPage from '../pages/admin/ClientesPage';
 import ConfiguracionPuntosPage from '../pages/admin/ConfiguracionPuntosPage';
+import UsuariosPage from '../pages/admin/UsuariosPage';
+import InstitucionesPage from '../pages/admin/InstitucionesPage';
+import ProfesionesPage from '../pages/admin/ProfesionesPage';
 
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../auth/useAuth';
@@ -56,6 +59,9 @@ function AppRouter() {
         >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/clientes-admin" element={<ClientesPage />} />
+            <Route path="/usuarios-admin" element={<UsuariosPage />} />
+            <Route path="/instituciones-admin" element={<InstitucionesPage />} />
+            <Route path="/profesiones-admin" element={<ProfesionesPage />} />
             <Route path="/beneficios-admin" element={<BeneficiosPage />} />
             <Route path="/puntos-admin" element={<PuntosPage />} />
             <Route path="/configuracion-puntos-admin" element={<ConfiguracionPuntosPage />} />

@@ -3,7 +3,6 @@ const Usuario = require('./usuario.model');
 const Institucion = require('./institucion.model');
 const Profesion = require('./profesion.model');
 const MovimientoPuntos = require('./movimientoPuntos.model');
-const MovimientoPuntos = require('./movimientoPuntos.model');
 const ConfiguracionPuntos = require('./configuracionPuntos.model');
 const Beneficio = require('./beneficio.model');
 const Canje = require('./canje.model');

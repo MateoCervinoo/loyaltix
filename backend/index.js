@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require('cors');
 const sequelize = require("./database/database");
+require('./models');
+
 const clientesRoutes = require('./routes/cliente.route');
 const institucionesRoutes = require('./routes/institucion.route');
 const profesionesRoutes = require('./routes/profesion.route');

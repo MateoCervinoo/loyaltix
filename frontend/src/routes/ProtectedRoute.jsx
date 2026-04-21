@@ -9,6 +9,14 @@ function ProtectedRoute({ children, rolesPermitidos }) {
     }
 
     if (rolesPermitidos && !rolesPermitidos.includes(usuario.rol)) {
+        if (usuario.rol === 'CLIENTE') {
+        return <Navigate to="/mi-cuenta" replace />;
+        }
+
+        if (usuario.rol === 'ADMIN' || usuario.rol === 'VENDEDOR') {
+        return <Navigate to="/dashboard" replace />;
+        }
+
         return <Navigate to="/login" replace />;
     }
 

@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const sequelize = require("./database/database");
 const clientesRoutes = require('./routes/cliente.route');
 const institucionesRoutes = require('./routes/institucion.route');
@@ -12,6 +13,10 @@ const beneficioRoutes = require('./routes/beneficio.route');
 // Crear servidor
 const app = express();
 app.use(express.json());
+
+app.use(cors({
+    origin: 'http://localhost:5173'
+}));
 
 // Controlar la ruta
 app.get("/", (req, res) => {

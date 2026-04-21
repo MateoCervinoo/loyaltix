@@ -9,6 +9,7 @@ import DashboardPage from '../pages/admin/DashboardPage';
 import BeneficiosPage from '../pages/admin/BeneficiosPage';
 import PuntosPage from '../pages/admin/PuntosPage';
 import MiCuentaPage from '../pages/cliente/MiCuentaPage';
+import ClientesPage from '../pages/admin/ClientesPage';
 
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../auth/useAuth';
@@ -53,6 +54,7 @@ function AppRouter() {
             }
         >
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/clientes-admin" element={<ClientesPage />} />
             <Route path="/beneficios-admin" element={<BeneficiosPage />} />
             <Route path="/puntos-admin" element={<PuntosPage />} />
         </Route>

@@ -16,15 +16,18 @@ function AdminLayout() {
             </div>
 
             <nav className="d-flex flex-column gap-2">
-                <Link className="btn btn-outline-secondary text-start" to="/dashboard">
+            <Link className="btn btn-outline-secondary text-start" to="/dashboard">
                 Dashboard
-                </Link>
-                <Link className="btn btn-outline-secondary text-start" to="/beneficios-admin">
+            </Link>
+            <Link className="btn btn-outline-secondary text-start" to="/clientes-admin">
+                Clientes
+            </Link>
+            <Link className="btn btn-outline-secondary text-start" to="/beneficios-admin">
                 Beneficios
-                </Link>
-                <Link className="btn btn-outline-secondary text-start" to="/puntos-admin">
+            </Link>
+            <Link className="btn btn-outline-secondary text-start" to="/puntos-admin">
                 Puntos
-                </Link>
+            </Link>
             </nav>
 
             <hr />

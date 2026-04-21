@@ -9,16 +9,37 @@ import DashboardPage from '../pages/admin/DashboardPage';
 import MiCuentaPage from '../pages/cliente/MiCuentaPage';
 
 import ProtectedRoute from './ProtectedRoute';
+import { useAuth } from '../auth/useAuth';
 
 function AppRouter() {
+    const { token, usuario } = useAuth();
+
+    const getHomeByRole = () => {
+        if (!token || !usuario) return '/login';
+
+        if (usuario.rol === 'ADMIN' || usuario.rol === 'VENDEDOR') {
+        return '/dashboard';
+        }
+
+        if (usuario.rol === 'CLIENTE') {
+        return '/mi-cuenta';
+        }
+
+        return '/login';
+    };
+
     return (
         <Routes>
         <Route
             path="/login"
             element={
-            <PublicLayout>
+            token && usuario ? (
+                <Navigate to={getHomeByRole()} replace />
+            ) : (
+                <PublicLayout>
                 <LoginPage />
-            </PublicLayout>
+                </PublicLayout>
+            )
             }
         />
 
@@ -44,7 +65,7 @@ function AppRouter() {
             }
         />
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to={getHomeByRole()} replace />} />
         </Routes>
     );
 }

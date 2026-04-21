@@ -6,19 +6,24 @@ function PuntosPage() {
     const { usuario } = useAuth();
 
     const [clienteId, setClienteId] = useState('');
-    const [montoCompra, setMontoCompra] = useState('');
-    const [descripcion, setDescripcion] = useState('');
-
     const [saldo, setSaldo] = useState(null);
     const [historial, setHistorial] = useState([]);
 
+    const [montoCompra, setMontoCompra] = useState('');
+    const [descripcionCarga, setDescripcionCarga] = useState('');
+
+    const [cantidadAjuste, setCantidadAjuste] = useState('');
+    const [descripcionAjuste, setDescripcionAjuste] = useState('');
+
     const [error, setError] = useState('');
     const [mensaje, setMensaje] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const buscarDatosCliente = async () => {
         try {
         setError('');
         setMensaje('');
+        setLoading(true);
 
         const [saldoRes, historialRes] = await Promise.all([
             api.get(`/puntos/cliente/${clienteId}/saldo`),
@@ -32,7 +37,20 @@ function PuntosPage() {
         setError(err.response?.data?.message || 'No se pudieron cargar los datos del cliente');
         setSaldo(null);
         setHistorial([]);
+        } finally {
+        setLoading(false);
         }
+    };
+
+    const handleBuscar = async (e) => {
+        e.preventDefault();
+
+        if (!clienteId) {
+        setError('Debés ingresar un cliente_id');
+        return;
+        }
+
+        await buscarDatosCliente();
     };
 
     const handleCargarPuntos = async (e) => {
@@ -45,16 +63,39 @@ function PuntosPage() {
         await api.post('/puntos/cargar', {
             cliente_id: Number(clienteId),
             monto_compra: Number(montoCompra),
-            descripcion: descripcion || 'Carga desde frontend',
+            descripcion: descripcionCarga || 'Carga desde frontend',
         });
 
         setMensaje('Puntos cargados correctamente');
         setMontoCompra('');
-        setDescripcion('');
+        setDescripcionCarga('');
         await buscarDatosCliente();
         } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || 'No se pudieron cargar puntos');
+        }
+    };
+
+    const handleAjuste = async (e) => {
+        e.preventDefault();
+
+        try {
+        setError('');
+        setMensaje('');
+
+        await api.post('/puntos/ajustar', {
+            cliente_id: Number(clienteId),
+            cantidad: Number(cantidadAjuste),
+            descripcion: descripcionAjuste || 'Ajuste desde frontend',
+        });
+
+        setMensaje('Ajuste realizado correctamente');
+        setCantidadAjuste('');
+        setDescripcionAjuste('');
+        await buscarDatosCliente();
+        } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.message || 'No se pudo realizar el ajuste');
         }
     };
 
@@ -69,27 +110,26 @@ function PuntosPage() {
             <div className="card-body">
             <h5 className="mb-3">Buscar cliente</h5>
 
-            <div className="row g-3 align-items-end">
+            <form onSubmit={handleBuscar}>
+                <div className="row g-3 align-items-end">
                 <div className="col-md-4">
-                <label className="form-label">Cliente ID</label>
-                <input
+                    <label className="form-label">Cliente ID</label>
+                    <input
                     type="number"
                     className="form-control"
                     value={clienteId}
                     onChange={(e) => setClienteId(e.target.value)}
-                />
+                    min="1"
+                    />
                 </div>
 
                 <div className="col-md-3">
-                <button
-                    className="btn btn-primary"
-                    onClick={buscarDatosCliente}
-                    disabled={!clienteId}
-                >
-                    Buscar saldo e historial
-                </button>
+                    <button className="btn btn-primary" type="submit" disabled={loading}>
+                    {loading ? 'Buscando...' : 'Buscar saldo e historial'}
+                    </button>
                 </div>
-            </div>
+                </div>
+            </form>
             </div>
         </div>
 
@@ -117,8 +157,8 @@ function PuntosPage() {
                     <input
                         type="text"
                         className="form-control"
-                        value={descripcion}
-                        onChange={(e) => setDescripcion(e.target.value)}
+                        value={descripcionCarga}
+                        onChange={(e) => setDescripcionCarga(e.target.value)}
                     />
                     </div>
                 </div>
@@ -129,6 +169,50 @@ function PuntosPage() {
                     disabled={!clienteId}
                 >
                     Cargar puntos
+                </button>
+                </form>
+            </div>
+            </div>
+        )}
+
+        {usuario?.rol === 'ADMIN' && (
+            <div className="card shadow-sm mb-4">
+            <div className="card-body">
+                <h5 className="mb-3">Ajuste manual</h5>
+
+                <form onSubmit={handleAjuste}>
+                <div className="row g-3">
+                    <div className="col-md-4">
+                    <label className="form-label">Cantidad de ajuste</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        value={cantidadAjuste}
+                        onChange={(e) => setCantidadAjuste(e.target.value)}
+                        required
+                    />
+                    <div className="form-text">
+                        Usá positivo para sumar y negativo para restar.
+                    </div>
+                    </div>
+
+                    <div className="col-md-8">
+                    <label className="form-label">Descripción</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={descripcionAjuste}
+                        onChange={(e) => setDescripcionAjuste(e.target.value)}
+                    />
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    className="btn btn-warning mt-3"
+                    disabled={!clienteId}
+                >
+                    Aplicar ajuste
                 </button>
                 </form>
             </div>

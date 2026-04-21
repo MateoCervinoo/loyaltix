@@ -6,6 +6,8 @@ import ClienteLayout from '../layouts/ClienteLayout';
 
 import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/admin/DashboardPage';
+import BeneficiosPage from '../pages/admin/BeneficiosPage';
+import PuntosPage from '../pages/admin/PuntosPage';
 import MiCuentaPage from '../pages/cliente/MiCuentaPage';
 
 import ProtectedRoute from './ProtectedRoute';
@@ -44,15 +46,16 @@ function AppRouter() {
         />
 
         <Route
-            path="/dashboard"
             element={
             <ProtectedRoute rolesPermitidos={['ADMIN', 'VENDEDOR']}>
-                <AdminLayout>
-                <DashboardPage />
-                </AdminLayout>
+                <AdminLayout />
             </ProtectedRoute>
             }
-        />
+        >
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/beneficios-admin" element={<BeneficiosPage />} />
+            <Route path="/puntos-admin" element={<PuntosPage />} />
+        </Route>
 
         <Route
             path="/mi-cuenta"

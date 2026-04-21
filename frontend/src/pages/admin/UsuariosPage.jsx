@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import ClienteSelectorModal from '../../components/ClienteSelectorModal';
 
 const initialForm = {
     email: '',
@@ -15,6 +16,8 @@ function UsuariosPage() {
 
     const [form, setForm] = useState(initialForm);
     const [editingId, setEditingId] = useState(null);
+
+    const [showClienteModal, setShowClienteModal] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -125,12 +128,24 @@ function UsuariosPage() {
 
     const getClienteTexto = (clienteId) => {
         if (!clienteId) return '-';
-        const cliente = clientes.find((c) => c.id === clienteId);
+        const cliente = clientes.find((c) => Number(c.id) === Number(clienteId));
         if (!cliente) return clienteId;
         return `${cliente.nombre} ${cliente.apellido}`;
     };
 
+    const clienteSeleccionado = clientes.find(
+        (c) => Number(c.id) === Number(form.cliente_id)
+    );
+
     const clienteInputDisabled = form.rol !== 'CLIENTE';
+
+    const handleSelectCliente = (cliente) => {
+        setForm({
+        ...form,
+        cliente_id: cliente.id,
+        });
+        setShowClienteModal(false);
+    };
 
     return (
         <div>
@@ -190,15 +205,31 @@ function UsuariosPage() {
 
                 <div className="col-md-4">
                     <label className="form-label">Cliente ID</label>
+                    <div className="input-group">
                     <input
-                    type="number"
-                    name="cliente_id"
-                    className="form-control"
-                    value={form.cliente_id}
-                    onChange={handleChange}
-                    disabled={clienteInputDisabled}
-                    required={form.rol === 'CLIENTE'}
+                        type="number"
+                        name="cliente_id"
+                        className="form-control"
+                        value={form.cliente_id}
+                        onChange={handleChange}
+                        disabled={clienteInputDisabled}
+                        required={form.rol === 'CLIENTE'}
                     />
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => setShowClienteModal(true)}
+                        disabled={clienteInputDisabled}
+                    >
+                        Buscar
+                    </button>
+                    </div>
+
+                    {form.rol === 'CLIENTE' && clienteSeleccionado && (
+                    <div className="form-text">
+                        Seleccionado: {clienteSeleccionado.nombre} {clienteSeleccionado.apellido}
+                    </div>
+                    )}
                 </div>
 
                 <div className="col-md-4 d-flex align-items-end">
@@ -282,6 +313,12 @@ function UsuariosPage() {
             )}
             </div>
         </div>
+
+        <ClienteSelectorModal
+            show={showClienteModal}
+            onClose={() => setShowClienteModal(false)}
+            onSelect={handleSelectCliente}
+        />
         </div>
     );
 }

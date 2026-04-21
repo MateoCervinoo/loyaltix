@@ -75,6 +75,7 @@ CREATE TABLE beneficio (
     descripcion VARCHAR(255),
     puntos_requeridos INTEGER NOT NULL,
     activo BOOLEAN NOT NULL DEFAULT TRUE,
+    imagen_url VARCHAR(500),
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_beneficio_puntos
         CHECK (puntos_requeridos > 0)

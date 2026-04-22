@@ -1,34 +1,63 @@
-# LoyalTix Backend
+# 🚀 LoyalTix
 
-Backend de sistema de fidelización de clientes.
+<p align="center">
+  <img src="./frontend/src/resources/logo/loyaltix-logo-main.png" alt="LoyalTix Logo" width="200"/>
+</p>
 
-## Tecnologías
-- Node.js
-- Express
-- PostgreSQL
-- Sequelize
+---
 
-## Setup
+## 🌐 Demo
 
-1. Clonar repo
-2. Crear archivo .env basado en .env.example
-3. Instalar dependencias:
-   npm install
-4. Levantar servidor:
-   npm run dev
+🔗 Frontend: https://loyaltix-swart.vercel.app  
+🔗 Backend: https://loyaltix-backend.onrender.com  
 
-## Permisos
-ADMIN
-- Permisos para hacer todo
-VENDEDOR
-- Permiso para buscar, crear y modificar clientes
-- Permiso para buscar instituciones y profesiones
-CLIENTE
-- Permiso para buscar cliente (solo el propio)
-- Permiso para buscar usuario (solo el propio)
+---
 
-## Cambios post deploy
-- agregar codigo_externo a cliente
-- importar compras por Excel
-- notificar acreditación por mail
-- categorías/filtro de beneficios
+## ✨ ¿Qué es LoyalTix?
+
+LoyalTix es una aplicación web que permite a comercios gestionar un sistema de fidelización de clientes mediante acumulación de puntos y canje por beneficios.
+
+El sistema contempla distintos roles (admin, vendedor y cliente), cada uno con funcionalidades específicas.
+
+---
+
+## 🧩 Funcionalidades
+
+### 👨‍💼 Admin / Vendedor
+- Gestión de clientes
+- Gestión de usuarios (ADMIN, VENDEDOR, CLIENTE)
+- Carga de puntos por compras
+- Configuración de reglas de puntos
+- Creación y gestión de beneficios
+- Gestión de canjes
+- Dashboard con actividad reciente
+
+### 👤 Cliente
+- Visualización de puntos acumulados
+- Historial de movimientos
+- Visualización de beneficios
+- Generación de canjes
+- Seguimiento de canjes
+
+---
+
+## 🧠 Arquitectura
+
+Capa
+Frontend      ---> React + Vite + Bootstrap
+Backend       ---> Node.js + Express
+ORM           ---> Sequelize
+Base de datos ---> PostgreSQL (Neon)
+Deploy        ---> Vercel + Render
+
+---
+
+## 📸 Screenshots
+
+## 🚀 Roadmap
+🔜 Próximas mejoras (v2)
+- 📊 Importación de compras desde Excel
+- 📩 Notificaciones por email
+- 🧩 Filtros de beneficios por categoría/profesión
+- 🖼️ Subida de imágenes desde el sistema
+- 🎨 Mejoras de UI/UX

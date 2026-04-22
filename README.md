@@ -26,3 +26,9 @@ VENDEDOR
 CLIENTE
 - Permiso para buscar cliente (solo el propio)
 - Permiso para buscar usuario (solo el propio)
+
+## Cambios post deploy
+- agregar codigo_externo a cliente
+- importar compras por Excel
+- notificar acreditación por mail
+- categorías/filtro de beneficios

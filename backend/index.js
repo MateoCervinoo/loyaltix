@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require("express");
 const cors = require('cors');
 const sequelize = require("./database/database");
@@ -18,7 +20,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: 'http://localhost:5173'
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173'
 }));
 
 // Controlar la ruta
@@ -38,7 +40,7 @@ app.use('/api/beneficios', beneficioRoutes);
 app.use('/api/canjes', canjeRoutes);
 
 // Configuración general
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.locals.fechaInicio = new Date();
 
 // Iniciar servidor solo si conecta a la base

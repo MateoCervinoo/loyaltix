@@ -92,6 +92,7 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
                         <th>Nombre</th>
                         <th>Apellido</th>
                         <th>Teléfono</th>
+                        <th>Código externo</th>
                         <th></th>
                         </tr>
                     </thead>
@@ -102,6 +103,7 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
                             <td>{cliente.nombre}</td>
                             <td>{cliente.apellido}</td>
                             <td>{cliente.telefono}</td>
+                            <td>{cliente.codigo_externo}</td>
                             <td>
                             <button
                                 type="button"

@@ -9,6 +9,7 @@ const initialForm = {
     telefono: '',
     institucion_id: '',
     profesion_id: '',
+    codigo_externo: '',
 };
 
 function ClientesPage() {
@@ -85,6 +86,7 @@ function ClientesPage() {
         telefono: cliente.telefono || '',
         institucion_id: cliente.institucion_id || '',
         profesion_id: cliente.profesion_id || '',
+        codigo_externo: cliente.codigo_externo || '',
         });
         setError('');
         setMensaje('');
@@ -102,6 +104,7 @@ function ClientesPage() {
             telefono: form.telefono,
             institucion_id: Number(form.institucion_id),
             profesion_id: Number(form.profesion_id),
+            codigo_externo: form.codigo_externo,
         };
 
         if (editingId) {
@@ -220,6 +223,20 @@ function ClientesPage() {
                     ))}
                     </select>
                 </div>
+
+                <div className="col-md-6">
+                    <FormLabel htmlFor="codigo_externo" required>Código Externo</FormLabel>
+                    <input
+                        type="text"
+                        className="form-control"
+                        name="codigo_externo"
+                        value={form.codigo_externo || ''}
+                        onChange={handleChange}
+                    />
+                    <small className="text-muted">
+                        Identificador del sistema de facturación
+                    </small>
+                </div>
                 </div>
 
                 <div className="d-flex gap-2 mt-3">
@@ -260,6 +277,7 @@ function ClientesPage() {
                         <th>Teléfono</th>
                         <th>Institución</th>
                         <th>Profesión</th>
+                        <th>Código externo</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>
@@ -272,6 +290,7 @@ function ClientesPage() {
                         <td>{cliente.telefono}</td>
                         <td>{getInstitucionNombre(cliente.institucion_id)}</td>
                         <td>{getProfesionNombre(cliente.profesion_id)}</td>
+                        <td>{cliente.codigo_externo}</td>
                         <td>
                             <button
                             className="btn btn-sm btn-outline-primary"

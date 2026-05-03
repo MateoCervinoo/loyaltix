@@ -45,6 +45,11 @@ const Cliente = sequelize.define('Cliente', {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+    codigo_externo: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        unique: true
+    },
     }, {
     tableName: 'cliente',
     timestamps: false,

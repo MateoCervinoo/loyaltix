@@ -22,7 +22,8 @@ router.get(
                 'telefono',
                 'institucion_id',
                 'profesion_id',
-                'fecha_creacion'
+                'fecha_creacion',
+                'codigo_externo'
             ]
         });
 
@@ -51,7 +52,8 @@ router.get(
                 'telefono',
                 'institucion_id',
                 'profesion_id',
-                'fecha_creacion'
+                'fecha_creacion',
+                'codigo_externo'
             ],
             where: { id: req.params.id }
         });
@@ -85,8 +87,22 @@ router.post(
             apellido: req.body.apellido,
             telefono: req.body.telefono,
             institucion_id: req.body.institucion_id,
-            profesion_id: req.body.profesion_id
+            profesion_id: req.body.profesion_id,
+            codigo_externo: req.body.codigo_externo
         });
+
+        if (codigo_externo) {
+            const existente = await Cliente.findOne({
+                where: { codigo_externo }
+            });
+
+            if (existente) {
+                return res.status(400).json({
+                    codigo: 2.3,
+                    message: 'El código externo ya está en uso'
+                })
+            }
+        }
 
         res.status(201).json(item);
     } catch (err) {
@@ -125,7 +141,8 @@ router.put(
                 'telefono',
                 'institucion_id',
                 'profesion_id',
-                'fecha_creacion'
+                'fecha_creacion',
+                'codigo_externo'
             ],
             where: { id: req.params.id }
         });
@@ -142,6 +159,7 @@ router.put(
         item.telefono = req.body.telefono;
         item.institucion_id = req.body.institucion_id;
         item.profesion_id = req.body.profesion_id;
+        item.codigo_externo = req.body.codigo_externo;
 
         await item.save();
 

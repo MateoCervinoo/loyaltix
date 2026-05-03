@@ -18,6 +18,8 @@ MovimientoPuntos.belongsTo(Usuario, { foreignKey: 'creado_por' });
 MovimientoPuntos.belongsTo(ConfiguracionPuntos, { foreignKey: 'configuracion_puntos_id' });
 MovimientoPuntos.belongsTo(Beneficio, { foreignKey: 'beneficio_id' });
 
+Beneficio.belongsTo(Profesion, { foreignKey: 'profesion_id' });
+
 Canje.belongsTo(Cliente, { foreignKey: 'cliente_id' });
 Canje.belongsTo(Beneficio, { foreignKey: 'beneficio_id' });
 Canje.belongsTo(MovimientoPuntos, { foreignKey: 'movimiento_puntos_id' });

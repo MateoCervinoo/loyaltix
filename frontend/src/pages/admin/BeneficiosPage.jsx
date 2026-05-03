@@ -10,12 +10,14 @@ const initialForm = {
     imagen_url: '',
     puntos_requeridos: '',
     activo: true,
+    profesion_id: '',
 };
 
 function BeneficiosPage() {
     const { usuario } = useAuth();
 
     const [beneficios, setBeneficios] = useState([]);
+    const [profesiones, setProfesiones] = useState([]);
     const [form, setForm] = useState(initialForm);
     const [editingId, setEditingId] = useState(null);
 
@@ -26,6 +28,11 @@ function BeneficiosPage() {
     const fetchBeneficios = async () => {
         const res = await api.get('/beneficios');
         setBeneficios(res.data || []);
+    };
+
+    const fetchProfesiones = async () => {
+        const res = await api.get('/profesiones');
+        setProfesiones(res.data || []);
     };
 
     const recargarBeneficios = async () => {
@@ -44,6 +51,9 @@ function BeneficiosPage() {
         const loadInitialData = async () => {
         try {
             await fetchBeneficios();
+            if (usuario?.rol === 'ADMIN') {
+                await fetchProfesiones();
+            }
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'No se pudieron cargar los beneficios');
@@ -53,7 +63,7 @@ function BeneficiosPage() {
         };
 
         loadInitialData();
-    }, []);
+    }, [usuario?.rol]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -71,6 +81,7 @@ function BeneficiosPage() {
         imagen_url: beneficio.imagen_url || '',
         puntos_requeridos: beneficio.puntos_requeridos,
         activo: beneficio.activo,
+        profesion_id: beneficio.profesion_id || '',
         });
         setError('');
         setMensaje('');
@@ -87,17 +98,17 @@ function BeneficiosPage() {
         setMensaje('');
 
         try {
-        if (editingId) {
-            await api.put(`/beneficios/${editingId}`, {
+        const payload = {
             ...form,
             puntos_requeridos: Number(form.puntos_requeridos),
-            });
+            profesion_id: form.profesion_id === '' ? null : Number(form.profesion_id),
+        };
+
+        if (editingId) {
+            await api.put(`/beneficios/${editingId}`, payload);
             setMensaje('Beneficio actualizado correctamente');
         } else {
-            await api.post('/beneficios', {
-            ...form,
-            puntos_requeridos: Number(form.puntos_requeridos),
-            });
+            await api.post('/beneficios', payload);
             setMensaje('Beneficio creado correctamente');
         }
 
@@ -194,6 +205,24 @@ function BeneficiosPage() {
                     />
                 </div>
 
+                <div className="mb-3">
+                    <FormLabel htmlFor="profesion_id">Categoría</FormLabel>
+                    <select
+                    id="profesion_id"
+                    name="profesion_id"
+                    className="form-select"
+                    value={form.profesion_id}
+                    onChange={handleChange}
+                    >
+                    <option value="">General</option>
+                    {profesiones.map((profesion) => (
+                        <option key={profesion.id} value={profesion.id}>
+                        {profesion.nombre}
+                        </option>
+                    ))}
+                    </select>
+                </div>
+
                 <div className="form-check mb-3">
                     <input
                     type="checkbox"
@@ -245,6 +274,7 @@ function BeneficiosPage() {
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Puntos</th>
+                        <th>Categoría</th>
                         <th>Activo</th>
                         {usuario?.rol === 'ADMIN' && <th>Acciones</th>}
                     </tr>
@@ -271,6 +301,7 @@ function BeneficiosPage() {
                         <td>{beneficio.nombre}</td>
                         <td>{beneficio.descripcion}</td>
                         <td>{beneficio.puntos_requeridos}</td>
+                        <td>{beneficio.Profesion?.nombre || 'General'}</td>
                         <td>{beneficio.activo ? 'Sí' : 'No'}</td>
                         {usuario?.rol === 'ADMIN' && (
                             <td className="d-flex gap-2">

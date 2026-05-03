@@ -1,11 +1,28 @@
 const express = require('express');
 const router = express.Router();
 
-const { ValidationError } = require('sequelize');
-const Beneficio = require('../models/beneficio.model');
+const { Op, ValidationError } = require('sequelize');
+const { Beneficio, Cliente, Profesion } = require('../models');
 
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
+
+const normalizarProfesionId = (profesionId) => {
+    if (profesionId === undefined || profesionId === null || profesionId === '') {
+        return null;
+    }
+
+    return profesionId;
+};
+
+const validarProfesion = async (profesionId) => {
+    if (profesionId === null) {
+        return true;
+    }
+
+    const profesion = await Profesion.findByPk(profesionId);
+    return Boolean(profesion);
+};
 
 // GET /api/beneficios
 router.get(
@@ -16,13 +33,33 @@ router.get(
         try {
             let whereCondition = {};
 
-            // CLIENTE solo ve activos
             if (req.usuario.rol === 'CLIENTE') {
-                whereCondition.activo = true;
+                const cliente = await Cliente.findByPk(req.usuario.cliente_id);
+
+                if (!cliente) {
+                    return res.status(404).json({
+                        codigo: 12.11,
+                        message: 'Cliente no encontrado'
+                    });
+                }
+
+                whereCondition = {
+                    activo: true,
+                    [Op.or]: [
+                        { profesion_id: null },
+                        { profesion_id: cliente.profesion_id }
+                    ]
+                };
             }
 
             const items = await Beneficio.findAll({
                 where: whereCondition,
+                include: [
+                    {
+                        model: Profesion,
+                        attributes: ['id', 'nombre']
+                    }
+                ],
                 attributes: [
                     'id',
                     'nombre',
@@ -30,6 +67,7 @@ router.get(
                     'imagen_url',
                     'puntos_requeridos',
                     'activo',
+                    'profesion_id',
                     'fecha_creacion'
                 ],
                 order: [['fecha_creacion', 'DESC']]
@@ -55,13 +93,34 @@ router.get(
         try {
             let whereCondition = { id: req.params.id };
 
-            // CLIENTE solo puede ver activos
             if (req.usuario.rol === 'CLIENTE') {
-                whereCondition.activo = true;
+                const cliente = await Cliente.findByPk(req.usuario.cliente_id);
+
+                if (!cliente) {
+                    return res.status(404).json({
+                        codigo: 12.12,
+                        message: 'Cliente no encontrado'
+                    });
+                }
+
+                whereCondition = {
+                    id: req.params.id,
+                    activo: true,
+                    [Op.or]: [
+                        { profesion_id: null },
+                        { profesion_id: cliente.profesion_id }
+                    ]
+                };
             }
 
             const item = await Beneficio.findOne({
                 where: whereCondition,
+                include: [
+                    {
+                        model: Profesion,
+                        attributes: ['id', 'nombre']
+                    }
+                ],
                 attributes: [
                     'id',
                     'nombre',
@@ -69,6 +128,7 @@ router.get(
                     'imagen_url',
                     'puntos_requeridos',
                     'activo',
+                    'profesion_id',
                     'fecha_creacion'
                 ]
             });
@@ -98,12 +158,22 @@ router.post(
     roleMiddleware('ADMIN'),
     async (req, res) => {
         try {
+            const profesionId = normalizarProfesionId(req.body.profesion_id);
+
+            if (!(await validarProfesion(profesionId))) {
+                return res.status(400).json({
+                    codigo: 12.13,
+                    message: 'La profesión indicada no existe'
+                });
+            }
+
             const item = await Beneficio.create({
                 nombre: req.body.nombre,
                 descripcion: req.body.descripcion,
                 imagen_url: req.body.imagen_url,
                 puntos_requeridos: req.body.puntos_requeridos,
-                activo: req.body.activo
+                activo: req.body.activo,
+                profesion_id: profesionId
             });
 
             res.status(201).json(item);
@@ -145,11 +215,21 @@ router.put(
                 });
             }
 
+            const profesionId = normalizarProfesionId(req.body.profesion_id);
+
+            if (!(await validarProfesion(profesionId))) {
+                return res.status(400).json({
+                    codigo: 12.14,
+                    message: 'La profesión indicada no existe'
+                });
+            }
+
             item.nombre = req.body.nombre;
             item.descripcion = req.body.descripcion;
             item.imagen_url = req.body.imagen_url;
             item.puntos_requeridos = req.body.puntos_requeridos;
             item.activo = req.body.activo;
+            item.profesion_id = profesionId;
 
             await item.save();
 

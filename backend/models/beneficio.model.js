@@ -38,6 +38,10 @@ const Beneficio = sequelize.define('Beneficio', {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
     },
+    profesion_id: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+    },
     fecha_creacion: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

@@ -73,6 +73,14 @@ router.post(
                 });
             }
 
+            if (beneficio.profesion_id && Number(beneficio.profesion_id) !== Number(cliente.profesion_id)) {
+                await transaction.rollback();
+                return res.status(400).json({
+                    codigo: 13.16,
+                    message: 'El beneficio no está disponible para tu profesión'
+                });
+            }
+
             const saldoActual = await obtenerSaldoCliente(req.usuario.cliente_id, transaction);
 
             if (saldoActual < beneficio.puntos_requeridos) {

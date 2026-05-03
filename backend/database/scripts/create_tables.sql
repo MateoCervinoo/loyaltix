@@ -76,7 +76,10 @@ CREATE TABLE beneficio (
     puntos_requeridos INTEGER NOT NULL,
     activo BOOLEAN NOT NULL DEFAULT TRUE,
     imagen_url VARCHAR(500),
+    profesion_id BIGINT,
     fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_beneficio_profesion
+        FOREIGN KEY (profesion_id) REFERENCES profesion(id),
     CONSTRAINT chk_beneficio_puntos
         CHECK (puntos_requeridos > 0)
 );
@@ -171,6 +174,7 @@ CREATE INDEX idx_movimiento_configuracion ON movimiento_puntos(configuracion_pun
 CREATE INDEX idx_movimiento_beneficio ON movimiento_puntos(beneficio_id);
 
 CREATE INDEX idx_beneficio_activo ON beneficio(activo);
+CREATE INDEX idx_beneficio_profesion ON beneficio(profesion_id);
 CREATE INDEX idx_configuracion_activo ON configuracion_puntos(activo);
 
 CREATE INDEX idx_canje_cliente ON canje(cliente_id);

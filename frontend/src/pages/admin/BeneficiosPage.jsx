@@ -3,6 +3,8 @@ import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
 import FormLabel from '../../components/FormLabel';
 import BackToDashboard from '../../components/BackToDashboard';
+import ConfirmModal from '../../components/ConfirmModal';
+import { showToast } from '../../components/showToast';
 
 const initialForm = {
     nombre: '',
@@ -22,8 +24,7 @@ function BeneficiosPage() {
     const [editingId, setEditingId] = useState(null);
 
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [mensaje, setMensaje] = useState('');
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const fetchBeneficios = async () => {
         const res = await api.get('/beneficios');
@@ -41,7 +42,7 @@ function BeneficiosPage() {
         await fetchBeneficios();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudieron cargar los beneficios');
+        showToast(err.response?.data?.message || 'No se pudieron cargar los beneficios', 'error');
         } finally {
         setLoading(false);
         }
@@ -56,7 +57,7 @@ function BeneficiosPage() {
             }
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar los beneficios');
+            showToast(err.response?.data?.message || 'No se pudieron cargar los beneficios', 'error');
         } finally {
             setLoading(false);
         }
@@ -83,8 +84,6 @@ function BeneficiosPage() {
         activo: beneficio.activo,
         profesion_id: beneficio.profesion_id || '',
         });
-        setError('');
-        setMensaje('');
     };
 
     const resetForm = () => {
@@ -94,8 +93,6 @@ function BeneficiosPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setMensaje('');
 
         try {
         const payload = {
@@ -106,44 +103,48 @@ function BeneficiosPage() {
 
         if (editingId) {
             await api.put(`/beneficios/${editingId}`, payload);
-            setMensaje('Beneficio actualizado correctamente');
+            showToast('Beneficio actualizado', 'success');
         } else {
             await api.post('/beneficios', payload);
-            setMensaje('Beneficio creado correctamente');
+            showToast('Beneficio creado', 'success');
         }
 
         resetForm();
         await recargarBeneficios();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo guardar el beneficio');
+        showToast(err.response?.data?.message || 'No se pudo guardar el beneficio', 'error');
         }
     };
 
-    const handleToggle = async (id) => {
-        const confirmar = window.confirm('¿Querés cambiar el estado de este beneficio?');
-        if (!confirmar) return;
-
+    const toggleBeneficio = async (id) => {
         try {
-        setError('');
-        setMensaje('');
-
         await api.patch(`/beneficios/${id}/toggle-activo`);
-        setMensaje('Estado del beneficio actualizado');
+        showToast('Estado actualizado', 'success');
         await recargarBeneficios();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo cambiar el estado');
+        showToast(err.response?.data?.message || 'No se pudo cambiar el estado', 'error');
         }
+    };
+
+    const handleToggle = (id) => {
+        setConfirmAction({
+        message: '¿Querés cambiar el estado de este beneficio?',
+        onConfirm: () => toggleBeneficio(id),
+        });
+    };
+
+    const handleConfirm = () => {
+        const action = confirmAction?.onConfirm;
+        setConfirmAction(null);
+        action?.();
     };
 
     return (
         <div>
         <BackToDashboard />
         <h2 className="mb-4">Beneficios</h2>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-        {mensaje && <div className="alert alert-success">{mensaje}</div>}
 
         {usuario?.rol === 'ADMIN' && (
             <div className="card shadow-sm mb-4">
@@ -327,6 +328,12 @@ function BeneficiosPage() {
             )}
             </div>
         </div>
+        <ConfirmModal
+            show={Boolean(confirmAction)}
+            message={confirmAction?.message}
+            onConfirm={handleConfirm}
+            onCancel={() => setConfirmAction(null)}
+        />
         </div>
     );
 }

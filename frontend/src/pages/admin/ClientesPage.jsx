@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import FormLabel from '../../components/FormLabel';
 import BackToDashboard from '../../components/BackToDashboard';
+import { showToast } from '../../components/showToast';
 
 const initialForm = {
     nombre: '',
@@ -23,9 +24,6 @@ function ClientesPage() {
     const [editingId, setEditingId] = useState(null);
 
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [mensaje, setMensaje] = useState('');
-
     const fetchClientes = async (q = busqueda) => {
         const res = await api.get('/clientes', {
         params: { q },
@@ -49,7 +47,7 @@ function ClientesPage() {
         await Promise.all([fetchClientes(), fetchAuxiliares()]);
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+        showToast(err.response?.data?.message || 'No se pudieron cargar los datos', 'error');
         } finally {
         setLoading(false);
         }
@@ -61,7 +59,7 @@ function ClientesPage() {
             await fetchAuxiliares();
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+            showToast(err.response?.data?.message || 'No se pudieron cargar los datos', 'error');
         }
         };
 
@@ -75,7 +73,7 @@ function ClientesPage() {
             await fetchClientes(busqueda);
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar los clientes');
+            showToast(err.response?.data?.message || 'No se pudieron cargar los clientes', 'error');
         } finally {
             setLoading(false);
         }
@@ -107,14 +105,10 @@ function ClientesPage() {
         profesion_id: cliente.profesion_id || '',
         codigo_externo: cliente.codigo_externo || '',
         });
-        setError('');
-        setMensaje('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setMensaje('');
 
         try {
         const payload = {
@@ -129,17 +123,17 @@ function ClientesPage() {
 
         if (editingId) {
             await api.put(`/clientes/${editingId}`, payload);
-            setMensaje('Cliente actualizado correctamente');
+            showToast('Cliente actualizado', 'success');
         } else {
             await api.post('/clientes', payload);
-            setMensaje('Cliente creado correctamente');
+            showToast('Cliente creado', 'success');
         }
 
         resetForm();
         await recargarTodo();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo guardar el cliente');
+        showToast(err.response?.data?.message || 'No se pudo guardar el cliente', 'error');
         }
     };
 
@@ -155,9 +149,6 @@ function ClientesPage() {
         <div>
         <BackToDashboard />
         <h2 className="mb-4">Clientes</h2>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-        {mensaje && <div className="alert alert-success">{mensaje}</div>}
 
         <div className="card shadow-sm mb-4">
             <div className="card-body">

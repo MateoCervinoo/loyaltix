@@ -3,6 +3,8 @@ import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
 import FormLabel from '../../components/FormLabel';
 import BackToDashboard from '../../components/BackToDashboard';
+import ConfirmModal from '../../components/ConfirmModal';
+import { showToast } from '../../components/showToast';
 
 const initialForm = {
     monto_base: '',
@@ -18,8 +20,7 @@ function ConfiguracionPuntosPage() {
     const [editingId, setEditingId] = useState(null);
 
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [mensaje, setMensaje] = useState('');
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const fetchConfiguraciones = async () => {
         const res = await api.get('/configuracion-puntos');
@@ -32,7 +33,7 @@ function ConfiguracionPuntosPage() {
         await fetchConfiguraciones();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudieron cargar las configuraciones');
+        showToast(err.response?.data?.message || 'No se pudieron cargar las configuraciones', 'error');
         } finally {
         setLoading(false);
         }
@@ -44,7 +45,7 @@ function ConfiguracionPuntosPage() {
             await fetchConfiguraciones();
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar las configuraciones');
+            showToast(err.response?.data?.message || 'No se pudieron cargar las configuraciones', 'error');
         } finally {
             setLoading(false);
         }
@@ -74,14 +75,10 @@ function ConfiguracionPuntosPage() {
         puntos_base: config.puntos_base,
         activo: config.activo,
         });
-        setError('');
-        setMensaje('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setMensaje('');
 
         try {
         const payload = {
@@ -92,44 +89,48 @@ function ConfiguracionPuntosPage() {
 
         if (editingId) {
             await api.put(`/configuracion-puntos/${editingId}`, payload);
-            setMensaje('Configuración actualizada correctamente');
+            showToast('Configuración actualizada', 'success');
         } else {
             await api.post('/configuracion-puntos', payload);
-            setMensaje('Configuración creada correctamente');
+            showToast('Configuración creada', 'success');
         }
 
         resetForm();
         await recargarConfiguraciones();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo guardar la configuración');
+        showToast(err.response?.data?.message || 'No se pudo guardar la configuración', 'error');
         }
     };
 
-    const handleActivar = async (id) => {
-        const confirmar = window.confirm('¿Querés activar esta configuración?');
-        if (!confirmar) return;
-
+    const activarConfiguracion = async (id) => {
         try {
-        setError('');
-        setMensaje('');
-
         await api.patch(`/configuracion-puntos/${id}/activar`);
-        setMensaje('Configuración activada correctamente');
+        showToast('Configuración activada', 'success');
         await recargarConfiguraciones();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo activar la configuración');
+        showToast(err.response?.data?.message || 'No se pudo activar la configuración', 'error');
         }
+    };
+
+    const handleActivar = (id) => {
+        setConfirmAction({
+        message: '¿Querés activar esta configuración?',
+        onConfirm: () => activarConfiguracion(id),
+        });
+    };
+
+    const handleConfirm = () => {
+        const action = confirmAction?.onConfirm;
+        setConfirmAction(null);
+        action?.();
     };
 
     return (
         <div>
         <BackToDashboard />
         <h2 className="mb-4">Configuración de puntos</h2>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-        {mensaje && <div className="alert alert-success">{mensaje}</div>}
 
         {usuario?.rol === 'ADMIN' && (
             <div className="card shadow-sm mb-4">
@@ -260,6 +261,12 @@ function ConfiguracionPuntosPage() {
             )}
             </div>
         </div>
+        <ConfirmModal
+            show={Boolean(confirmAction)}
+            message={confirmAction?.message}
+            onConfirm={handleConfirm}
+            onCancel={() => setConfirmAction(null)}
+        />
         </div>
     );
 }

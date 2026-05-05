@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
 import BackToDashboard from '../../components/BackToDashboard';
+import ConfirmModal from '../../components/ConfirmModal';
+import { showToast } from '../../components/showToast';
 
 function CanjesPendientesPage() {
     const { usuario } = useAuth();
 
     const [canjes, setCanjes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [mensaje, setMensaje] = useState('');
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const fetchCanjesPendientes = async () => {
         const res = await api.get('/canjes/pendientes');
@@ -22,7 +23,7 @@ function CanjesPendientesPage() {
             await fetchCanjesPendientes();
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar los canjes pendientes');
+            showToast(err.response?.data?.message || 'No se pudieron cargar los canjes', 'error');
         } finally {
             setLoading(false);
         }
@@ -31,47 +32,52 @@ function CanjesPendientesPage() {
         loadInitialData();
     }, []);
 
-    const handleUtilizar = async (id) => {
-        const confirmar = window.confirm('¿Querés marcar este canje como utilizado?');
-        if (!confirmar) return;
-
+    const utilizarCanje = async (id) => {
         try {
-        setError('');
-        setMensaje('');
-
         await api.patch(`/canjes/${id}/utilizar`);
-        setMensaje('Canje marcado como utilizado');
+        showToast('Canje utilizado', 'success');
         await fetchCanjesPendientes();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo utilizar el canje');
+        showToast(err.response?.data?.message || 'No se pudo utilizar el canje', 'error');
         }
     };
 
-    const handleCancelar = async (id) => {
-        const confirmar = window.confirm('¿Querés cancelar este canje?');
-        if (!confirmar) return;
-
+    const cancelarCanje = async (id) => {
         try {
-        setError('');
-        setMensaje('');
-
         await api.patch(`/canjes/${id}/cancelar`);
-        setMensaje('Canje cancelado correctamente');
+        showToast('Canje cancelado', 'success');
         await fetchCanjesPendientes();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo cancelar el canje');
+        showToast(err.response?.data?.message || 'No se pudo cancelar el canje', 'error');
         }
+    };
+
+    const handleUtilizar = (id) => {
+        setConfirmAction({
+        message: '¿Querés marcar este canje como utilizado?',
+        onConfirm: () => utilizarCanje(id),
+        });
+    };
+
+    const handleCancelar = (id) => {
+        setConfirmAction({
+        message: '¿Querés cancelar este canje?',
+        onConfirm: () => cancelarCanje(id),
+        });
+    };
+
+    const handleConfirm = () => {
+        const action = confirmAction?.onConfirm;
+        setConfirmAction(null);
+        action?.();
     };
 
     return (
         <div>
         <BackToDashboard />
         <h2 className="mb-4">Canjes pendientes</h2>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-        {mensaje && <div className="alert alert-success">{mensaje}</div>}
 
         <div className="card shadow-sm">
             <div className="card-body">
@@ -129,6 +135,12 @@ function CanjesPendientesPage() {
             )}
             </div>
         </div>
+        <ConfirmModal
+            show={Boolean(confirmAction)}
+            message={confirmAction?.message}
+            onConfirm={handleConfirm}
+            onCancel={() => setConfirmAction(null)}
+        />
         </div>
     );
 }

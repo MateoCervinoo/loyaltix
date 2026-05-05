@@ -14,6 +14,7 @@ const puntosRoutes = require('./routes/puntos.route');
 const configuracionPuntosRoutes = require('./routes/configuracionPuntos.route');
 const beneficioRoutes = require('./routes/beneficio.route');
 const canjeRoutes = require('./routes/canje.route');
+const dashboardRoutes = require('./routes/dashboard.route');
 
 // Crear servidor
 const app = express();
@@ -38,6 +39,7 @@ app.use('/api/puntos', puntosRoutes);
 app.use('/api/configuracion-puntos', configuracionPuntosRoutes);
 app.use('/api/beneficios', beneficioRoutes);
 app.use('/api/canjes', canjeRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Configuración general
 const port = process.env.PORT || 3000;

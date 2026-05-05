@@ -13,6 +13,13 @@ function DashboardPage() {
         configuracionActiva: null,
     });
 
+    const [stats, setStats] = useState({
+        clientes: 0,
+        canjes: 0,
+        beneficios: 0,
+        puntos: 0,
+    });
+
     const [actividadReciente, setActividadReciente] = useState([]);
 
     const [loading, setLoading] = useState(true);
@@ -24,6 +31,7 @@ function DashboardPage() {
             setError('');
 
             const requests = [
+            api.get('/dashboard/stats'),
             api.get('/clientes'),
             api.get('/beneficios'),
             ];
@@ -35,22 +43,32 @@ function DashboardPage() {
 
             const responses = await Promise.allSettled(requests);
 
+            const dashboardStats =
+            responses[0].status === 'fulfilled' ? responses[0].value.data : null;
+
             const clientes =
-            responses[0].status === 'fulfilled' ? responses[0].value.data || [] : [];
+            responses[1].status === 'fulfilled' ? responses[1].value.data || [] : [];
 
             const beneficios =
-            responses[1].status === 'fulfilled' ? responses[1].value.data || [] : [];
+            responses[2].status === 'fulfilled' ? responses[2].value.data || [] : [];
 
             let usuarios = [];
             let configuracionActiva = null;
 
             if (usuario?.rol === 'ADMIN') {
             usuarios =
-                responses[2]?.status === 'fulfilled' ? responses[2].value.data || [] : [];
+                responses[3]?.status === 'fulfilled' ? responses[3].value.data || [] : [];
 
             configuracionActiva =
-                responses[3]?.status === 'fulfilled' ? responses[3].value.data : null;
+                responses[4]?.status === 'fulfilled' ? responses[4].value.data : null;
             }
+
+            setStats({
+            clientes: dashboardStats?.clientes ?? clientes.length,
+            canjes: dashboardStats?.canjes ?? 0,
+            beneficios: dashboardStats?.beneficios ?? beneficios.filter((b) => b.activo).length,
+            puntos: dashboardStats?.puntos ?? 0,
+            });
 
             setResumen({
             clientes: clientes.length,
@@ -100,6 +118,44 @@ function DashboardPage() {
             <p>Cargando dashboard...</p>
         ) : (
             <>
+            <div className="row g-3 mb-4">
+                <div className="col-sm-6 col-xl-3">
+                <div className="card shadow-sm h-100 border-0">
+                    <div className="card-body p-4">
+                    <div className="text-muted small mb-2">Clientes</div>
+                    <div className="fs-3 fw-semibold">{stats.clientes}</div>
+                    </div>
+                </div>
+                </div>
+
+                <div className="col-sm-6 col-xl-3">
+                <div className="card shadow-sm h-100 border-0">
+                    <div className="card-body p-4">
+                    <div className="text-muted small mb-2">Canjes</div>
+                    <div className="fs-3 fw-semibold">{stats.canjes}</div>
+                    </div>
+                </div>
+                </div>
+
+                <div className="col-sm-6 col-xl-3">
+                <div className="card shadow-sm h-100 border-0">
+                    <div className="card-body p-4">
+                    <div className="text-muted small mb-2">Beneficios</div>
+                    <div className="fs-3 fw-semibold">{stats.beneficios}</div>
+                    </div>
+                </div>
+                </div>
+
+                <div className="col-sm-6 col-xl-3">
+                <div className="card shadow-sm h-100 border-0">
+                    <div className="card-body p-4">
+                    <div className="text-muted small mb-2">Puntos</div>
+                    <div className="fs-3 fw-semibold">{stats.puntos}</div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
             <div className="row g-4 mb-4">
                 <div className="col-lg-5">
                 <div className="card shadow-sm h-100">

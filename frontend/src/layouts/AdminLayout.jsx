@@ -218,8 +218,8 @@ function AdminLayout() {
             <Outlet />
         </main>
 
-        <footer className="text-center text-muted py-3">
-            LoyalTix © 2026
+        <footer className="text-center py-3">
+            LoyalTix v1.1.0 — © 2026
         </footer>
         </div>
     );

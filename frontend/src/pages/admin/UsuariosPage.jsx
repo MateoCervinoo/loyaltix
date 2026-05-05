@@ -3,6 +3,7 @@ import api from '../../api/axios';
 import ClienteSelectorModal from '../../components/ClienteSelectorModal';
 import FormLabel from '../../components/FormLabel';
 import BackToDashboard from '../../components/BackToDashboard';
+import { showToast } from '../../components/showToast';
 
 const initialForm = {
     email: '',
@@ -22,9 +23,6 @@ function UsuariosPage() {
     const [showClienteModal, setShowClienteModal] = useState(false);
 
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [mensaje, setMensaje] = useState('');
-
     const fetchUsuarios = async () => {
         const res = await api.get('/usuarios');
         setUsuarios(res.data || []);
@@ -41,7 +39,7 @@ function UsuariosPage() {
         await Promise.all([fetchUsuarios(), fetchClientes()]);
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+        showToast(err.response?.data?.message || 'No se pudieron cargar los datos', 'error');
         } finally {
         setLoading(false);
         }
@@ -53,7 +51,7 @@ function UsuariosPage() {
             await Promise.all([fetchUsuarios(), fetchClientes()]);
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+            showToast(err.response?.data?.message || 'No se pudieron cargar los datos', 'error');
         } finally {
             setLoading(false);
         }
@@ -98,14 +96,10 @@ function UsuariosPage() {
         cliente_id: usuario.cliente_id || '',
         activo: usuario.activo ?? true,
         });
-        setError('');
-        setMensaje('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setMensaje('');
 
         try {
         const payload = {
@@ -121,17 +115,17 @@ function UsuariosPage() {
 
         if (editingId) {
             await api.put(`/usuarios/${editingId}`, payload);
-            setMensaje('Usuario actualizado correctamente');
+            showToast('Usuario actualizado', 'success');
         } else {
             await api.post('/usuarios', payload);
-            setMensaje('Usuario creado correctamente');
+            showToast('Usuario creado', 'success');
         }
 
         resetForm();
         await recargarTodo();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo guardar el usuario');
+        showToast(err.response?.data?.message || 'No se pudo guardar el usuario', 'error');
         }
     };
 
@@ -161,9 +155,6 @@ function UsuariosPage() {
         <div>
         <BackToDashboard />
         <h2 className="mb-4">Usuarios</h2>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-        {mensaje && <div className="alert alert-success">{mensaje}</div>}
 
         <div className="card shadow-sm mb-4">
             <div className="card-body">

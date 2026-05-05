@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import api from '../../api/axios';
 import BeneficioDetalleModal from '../../components/BeneficioDetalleModal';
+import ConfirmModal from '../../components/ConfirmModal';
 import HistorialCompletoModal from '../../components/HistorialCompletoModal';
 import MisCanjesCard from '../../components/MisCanjesCard';
 import MisCanjesModal from '../../components/MisCanjesModal';
+import { showToast } from '../../components/showToast';
 
 function MiCuentaPage() {
     const [saldo, setSaldo] = useState(0);
@@ -22,8 +24,7 @@ function MiCuentaPage() {
     const [loadingBeneficios, setLoadingBeneficios] = useState(true);
     const [loadingCanjes, setLoadingCanjes] = useState(true);
 
-    const [error, setError] = useState('');
-    const [mensaje, setMensaje] = useState('');
+    const [confirmAction, setConfirmAction] = useState(null);
 
     const fetchDatos = async () => {
         const [saldoRes, historialRes, beneficiosRes, canjesRes] = await Promise.all([
@@ -41,8 +42,6 @@ function MiCuentaPage() {
 
     const recargarDatos = async () => {
         try {
-        setError('');
-        setMensaje('');
         setLoadingSaldo(true);
         setLoadingHistorial(true);
         setLoadingBeneficios(true);
@@ -51,7 +50,7 @@ function MiCuentaPage() {
         await fetchDatos();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+        showToast(err.response?.data?.message || 'No se pudieron cargar los datos', 'error');
         } finally {
         setLoadingSaldo(false);
         setLoadingHistorial(false);
@@ -63,12 +62,10 @@ function MiCuentaPage() {
     useEffect(() => {
         const loadInitialData = async () => {
         try {
-            setError('');
-            setMensaje('');
             await fetchDatos();
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'No se pudieron cargar los datos');
+            showToast(err.response?.data?.message || 'No se pudieron cargar los datos', 'error');
         } finally {
             setLoadingSaldo(false);
             setLoadingHistorial(false);
@@ -92,42 +89,37 @@ function MiCuentaPage() {
         setShowBeneficioModal(false);
     };
 
-    const handleCanjear = async (beneficioId) => {
-        const confirmar = window.confirm('¿Querés generar este canje?');
-        if (!confirmar) return;
-
+    const generarCanje = async (beneficioId) => {
         try {
-        setError('');
-        setMensaje('');
-
         const res = await api.post('/canjes', {
             beneficio_id: beneficioId,
         });
 
-        setMensaje(`Canje generado correctamente. Código: ${res.data.canje.codigo}`);
+        showToast(`Canje generado: ${res.data.canje.codigo}`, 'success');
         handleCloseBeneficio();
         await recargarDatos();
         } catch (err) {
         console.error(err);
-        setError(err.response?.data?.message || 'No se pudo realizar el canje');
+        showToast(err.response?.data?.message || 'No se pudo realizar el canje', 'error');
         }
+    };
+
+    const handleCanjear = (beneficioId) => {
+        setConfirmAction({
+        message: '¿Querés generar este canje?',
+        onConfirm: () => generarCanje(beneficioId),
+        });
+    };
+
+    const handleConfirm = () => {
+        const action = confirmAction?.onConfirm;
+        setConfirmAction(null);
+        action?.();
     };
 
     return (
         <div className="container py-3">
         <h2 className="mb-4">Mi cuenta</h2>
-
-        {error && (
-            <div className="alert alert-danger" role="alert">
-            {error}
-            </div>
-        )}
-
-        {mensaje && (
-            <div className="alert alert-success" role="alert">
-            {mensaje}
-            </div>
-        )}
 
         <div className="row g-4 mb-4">
             <div className="col-lg-4">
@@ -259,6 +251,13 @@ function MiCuentaPage() {
             show={showCanjesModal}
             canjes={canjes}
             onClose={() => setShowCanjesModal(false)}
+        />
+
+        <ConfirmModal
+            show={Boolean(confirmAction)}
+            message={confirmAction?.message}
+            onConfirm={handleConfirm}
+            onCancel={() => setConfirmAction(null)}
         />
         </div>
     );

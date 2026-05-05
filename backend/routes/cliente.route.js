@@ -7,6 +7,30 @@ const { Op, ValidationError } = require('sequelize');
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
 
+const normalizarEmail = (email) => {
+    if (email === undefined || email === null || String(email).trim() === '') {
+        return null;
+    }
+
+    return String(email).trim();
+};
+
+const emailValido = (email) => {
+    return email === null || email.includes('@');
+};
+
+const atributosCliente = [
+    'id',
+    'nombre',
+    'apellido',
+    'telefono',
+    'email',
+    'institucion_id',
+    'profesion_id',
+    'fecha_creacion',
+    'codigo_externo'
+];
+
 // GET /api/clientes
 router.get(
     '/',
@@ -27,16 +51,7 @@ router.get(
             : undefined;
 
         const items = await Cliente.findAll({
-            attributes: [
-                'id',
-                'nombre',
-                'apellido',
-                'telefono',
-                'institucion_id',
-                'profesion_id',
-                'fecha_creacion',
-                'codigo_externo'
-            ],
+            attributes: atributosCliente,
             include: [
                 { model: Institucion },
                 { model: Profesion }
@@ -63,16 +78,7 @@ router.get(
     async (req, res) => {
     try {
         const item = await Cliente.findOne({
-            attributes: [
-                'id',
-                'nombre',
-                'apellido',
-                'telefono',
-                'institucion_id',
-                'profesion_id',
-                'fecha_creacion',
-                'codigo_externo'
-            ],
+            attributes: atributosCliente,
             where: { id: req.params.id }
         });
 
@@ -100,14 +106,16 @@ router.post(
     roleMiddleware('ADMIN', 'VENDEDOR'),
     async (req, res) => {
     try {
-        const item = await Cliente.create({
-            nombre: req.body.nombre,
-            apellido: req.body.apellido,
-            telefono: req.body.telefono,
-            institucion_id: req.body.institucion_id,
-            profesion_id: req.body.profesion_id,
-            codigo_externo: req.body.codigo_externo
-        });
+        const email = normalizarEmail(req.body.email);
+
+        if (!emailValido(email)) {
+            return res.status(400).json({
+                codigo: 2.9,
+                message: 'El email debe incluir @'
+            });
+        }
+
+        const codigo_externo = req.body.codigo_externo;
 
         if (codigo_externo) {
             const existente = await Cliente.findOne({
@@ -117,10 +125,20 @@ router.post(
             if (existente) {
                 return res.status(400).json({
                     codigo: 2.3,
-                    message: 'El código externo ya está en uso'
-                })
+                    message: 'El codigo externo ya esta en uso'
+                });
             }
         }
+
+        const item = await Cliente.create({
+            nombre: req.body.nombre,
+            apellido: req.body.apellido,
+            telefono: req.body.telefono,
+            email,
+            institucion_id: req.body.institucion_id,
+            profesion_id: req.body.profesion_id,
+            codigo_externo
+        });
 
         res.status(201).json(item);
     } catch (err) {
@@ -152,16 +170,7 @@ router.put(
     async (req, res) => {
     try {
         const item = await Cliente.findOne({
-            attributes: [
-                'id',
-                'nombre',
-                'apellido',
-                'telefono',
-                'institucion_id',
-                'profesion_id',
-                'fecha_creacion',
-                'codigo_externo'
-            ],
+            attributes: atributosCliente,
             where: { id: req.params.id }
         });
 
@@ -172,9 +181,19 @@ router.put(
             });
         }
 
+        const email = normalizarEmail(req.body.email);
+
+        if (!emailValido(email)) {
+            return res.status(400).json({
+                codigo: 2.10,
+                message: 'El email debe incluir @'
+            });
+        }
+
         item.nombre = req.body.nombre;
         item.apellido = req.body.apellido;
         item.telefono = req.body.telefono;
+        item.email = email;
         item.institucion_id = req.body.institucion_id;
         item.profesion_id = req.body.profesion_id;
         item.codigo_externo = req.body.codigo_externo;

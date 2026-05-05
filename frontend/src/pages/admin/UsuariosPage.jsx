@@ -74,6 +74,13 @@ function UsuariosPage() {
         updatedForm.cliente_id = '';
         }
 
+        if (name === 'cliente_id') {
+        const cliente = clientes.find((c) => Number(c.id) === Number(value));
+        if (cliente) {
+            updatedForm.email = cliente.email || '';
+        }
+        }
+
         setForm(updatedForm);
     };
 
@@ -145,6 +152,7 @@ function UsuariosPage() {
         setForm({
         ...form,
         cliente_id: cliente.id,
+        email: cliente.email || '',
         });
         setShowClienteModal(false);
     };

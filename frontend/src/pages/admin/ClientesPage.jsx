@@ -16,6 +16,7 @@ function ClientesPage() {
     const [clientes, setClientes] = useState([]);
     const [instituciones, setInstituciones] = useState([]);
     const [profesiones, setProfesiones] = useState([]);
+    const [busqueda, setBusqueda] = useState('');
 
     const [form, setForm] = useState(initialForm);
     const [editingId, setEditingId] = useState(null);
@@ -24,8 +25,10 @@ function ClientesPage() {
     const [error, setError] = useState('');
     const [mensaje, setMensaje] = useState('');
 
-    const fetchClientes = async () => {
-        const res = await api.get('/clientes');
+    const fetchClientes = async (q = busqueda) => {
+        const res = await api.get('/clientes', {
+        params: { q },
+        });
         setClientes(res.data || []);
     };
 
@@ -54,17 +57,31 @@ function ClientesPage() {
     useEffect(() => {
         const loadInitialData = async () => {
         try {
-            await Promise.all([fetchClientes(), fetchAuxiliares()]);
+            await fetchAuxiliares();
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'No se pudieron cargar los datos');
-        } finally {
-            setLoading(false);
         }
         };
 
         loadInitialData();
     }, []);
+
+    useEffect(() => {
+        const loadClientes = async () => {
+        try {
+            setLoading(true);
+            await fetchClientes(busqueda);
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'No se pudieron cargar los clientes');
+        } finally {
+            setLoading(false);
+        }
+        };
+
+        loadClientes();
+    }, [busqueda]);
 
     const handleChange = (e) => {
         setForm({
@@ -261,6 +278,13 @@ function ClientesPage() {
         <div className="card shadow-sm">
             <div className="card-body">
             <h5 className="mb-3">Listado de clientes</h5>
+            <input
+                type="text"
+                className="form-control mb-3"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar por nombre, teléfono o código..."
+            />
 
             {loading ? (
                 <p>Cargando...</p>

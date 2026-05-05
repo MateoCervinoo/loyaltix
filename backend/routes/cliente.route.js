@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const Cliente = require('../models/cliente.model');
-const { ValidationError } = require('sequelize');
+const { Cliente, Institucion, Profesion } = require('../models');
+const { Op, ValidationError } = require('sequelize');
 
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
@@ -14,6 +14,18 @@ router.get(
     roleMiddleware('ADMIN', 'VENDEDOR'),
     async (req, res) => {
     try {
+        const q = req.query.q?.trim();
+        const where = q
+            ? {
+                [Op.or]: [
+                    { nombre: { [Op.iLike]: `%${q}%` } },
+                    { apellido: { [Op.iLike]: `%${q}%` } },
+                    { telefono: { [Op.iLike]: `%${q}%` } },
+                    { codigo_externo: { [Op.iLike]: `%${q}%` } }
+                ]
+            }
+            : undefined;
+
         const items = await Cliente.findAll({
             attributes: [
                 'id',
@@ -24,7 +36,13 @@ router.get(
                 'profesion_id',
                 'fecha_creacion',
                 'codigo_externo'
-            ]
+            ],
+            include: [
+                { model: Institucion },
+                { model: Profesion }
+            ],
+            where,
+            order: [['fecha_creacion', 'DESC']]
         });
 
         res.json(items);

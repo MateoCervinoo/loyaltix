@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api/axios';
 
 function ClienteSelectorModal({ show, onClose, onSelect }) {
@@ -7,8 +7,10 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const fetchClientes = async () => {
-        const res = await api.get('/clientes');
+    const fetchClientes = async (q = busqueda) => {
+        const res = await api.get('/clientes', {
+        params: { q },
+        });
         setClientes(res.data || []);
     };
 
@@ -20,7 +22,7 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
             setLoading(true);
             setError('');
             setBusqueda('');
-            await fetchClientes();
+            await fetchClientes('');
         } catch (err) {
             console.error(err);
             setError(err.response?.data?.message || 'No se pudieron cargar los clientes');
@@ -32,18 +34,24 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
         loadInitialData();
     }, [show]);
 
-    const clientesFiltrados = useMemo(() => {
-        const texto = busqueda.trim().toLowerCase();
+    useEffect(() => {
+        if (!show) return;
 
-        if (!texto) return clientes;
+        const loadClientes = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            await fetchClientes(busqueda);
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || 'No se pudieron cargar los clientes');
+        } finally {
+            setLoading(false);
+        }
+        };
 
-        return clientes.filter((cliente) => {
-        const nombreCompleto = `${cliente.nombre} ${cliente.apellido}`.toLowerCase();
-        const telefono = (cliente.telefono || '').toLowerCase();
-
-        return nombreCompleto.includes(texto) || telefono.includes(texto);
-        });
-    }, [clientes, busqueda]);
+        loadClientes();
+    }, [busqueda]);
 
     if (!show) return null;
 
@@ -69,11 +77,11 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <div className="mb-3">
-                <label className="form-label">Buscar por nombre, apellido o teléfono</label>
+                <label className="form-label">Buscar por nombre, apellido, teléfono o código externo</label>
                 <input
                     type="text"
                     className="form-control"
-                    placeholder="Ej: Juan Pérez o 351..."
+                    placeholder="Buscar por nombre, teléfono o código..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />
@@ -81,7 +89,7 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
 
                 {loading ? (
                 <p>Cargando clientes...</p>
-                ) : clientesFiltrados.length === 0 ? (
+                ) : clientes.length === 0 ? (
                 <p className="text-muted mb-0">No se encontraron clientes.</p>
                 ) : (
                 <div className="table-responsive">
@@ -97,7 +105,7 @@ function ClienteSelectorModal({ show, onClose, onSelect }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {clientesFiltrados.map((cliente) => (
+                        {clientes.map((cliente) => (
                         <tr key={cliente.id}>
                             <td>{cliente.id}</td>
                             <td>{cliente.nombre}</td>

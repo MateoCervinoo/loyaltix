@@ -35,6 +35,10 @@ const Cliente = sequelize.define('Cliente', {
         },
         },
     },
+    email: {
+        type: DataTypes.STRING(150),
+        allowNull: true,
+    },
     institucion_id: {
         type: DataTypes.BIGINT,
     },

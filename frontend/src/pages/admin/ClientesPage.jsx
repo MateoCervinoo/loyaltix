@@ -7,6 +7,7 @@ const initialForm = {
     nombre: '',
     apellido: '',
     telefono: '',
+    email: '',
     institucion_id: '',
     profesion_id: '',
     codigo_externo: '',
@@ -101,6 +102,7 @@ function ClientesPage() {
         nombre: cliente.nombre || '',
         apellido: cliente.apellido || '',
         telefono: cliente.telefono || '',
+        email: cliente.email || '',
         institucion_id: cliente.institucion_id || '',
         profesion_id: cliente.profesion_id || '',
         codigo_externo: cliente.codigo_externo || '',
@@ -119,6 +121,7 @@ function ClientesPage() {
             nombre: form.nombre,
             apellido: form.apellido,
             telefono: form.telefono,
+            email: form.email.trim() || null,
             institucion_id: Number(form.institucion_id),
             profesion_id: Number(form.profesion_id),
             codigo_externo: form.codigo_externo,
@@ -191,7 +194,7 @@ function ClientesPage() {
                 </div>
 
                 <div className="col-md-6">
-                    <FormLabel htmlFor="telefono" required>Teléfono</FormLabel>
+                    <FormLabel htmlFor="telefono" required>Telefono</FormLabel>
                     <input
                     id="telefono"
                     type="text"
@@ -204,7 +207,19 @@ function ClientesPage() {
                 </div>
 
                 <div className="col-md-6">
-                    <FormLabel htmlFor="institucion_id" required>Institución</FormLabel>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    className="form-control"
+                    value={form.email}
+                    onChange={handleChange}
+                    />
+                </div>
+
+                <div className="col-md-6">
+                    <FormLabel htmlFor="institucion_id" required>Institucion</FormLabel>
                     <select
                     id="institucion_id"
                     name="institucion_id"
@@ -213,7 +228,7 @@ function ClientesPage() {
                     onChange={handleChange}
                     required
                     >
-                    <option value="">Seleccionar institución</option>
+                    <option value="">Seleccionar institucion</option>
                     {instituciones.map((inst) => (
                         <option key={inst.id} value={inst.id}>
                         {inst.nombre}
@@ -223,7 +238,7 @@ function ClientesPage() {
                 </div>
 
                 <div className="col-md-6">
-                    <FormLabel htmlFor="profesion_id" required>Profesión</FormLabel>
+                    <FormLabel htmlFor="profesion_id" required>Profesion</FormLabel>
                     <select
                     id="profesion_id"
                     name="profesion_id"
@@ -232,7 +247,7 @@ function ClientesPage() {
                     onChange={handleChange}
                     required
                     >
-                    <option value="">Seleccionar profesión</option>
+                    <option value="">Seleccionar profesion</option>
                     {profesiones.map((prof) => (
                         <option key={prof.id} value={prof.id}>
                         {prof.nombre}
@@ -242,7 +257,7 @@ function ClientesPage() {
                 </div>
 
                 <div className="col-md-6">
-                    <FormLabel htmlFor="codigo_externo" required>Código Externo</FormLabel>
+                    <FormLabel htmlFor="codigo_externo" required>Codigo Externo</FormLabel>
                     <input
                         type="text"
                         className="form-control"
@@ -251,7 +266,7 @@ function ClientesPage() {
                         onChange={handleChange}
                     />
                     <small className="text-muted">
-                        Identificador del sistema de facturación
+                        Identificador del sistema de facturacion
                     </small>
                 </div>
                 </div>
@@ -283,7 +298,7 @@ function ClientesPage() {
                 className="form-control mb-3"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar por nombre, teléfono o código..."
+                placeholder="Buscar por nombre, telefono o codigo..."
             />
 
             {loading ? (
@@ -298,10 +313,11 @@ function ClientesPage() {
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Apellido</th>
-                        <th>Teléfono</th>
-                        <th>Institución</th>
-                        <th>Profesión</th>
-                        <th>Código externo</th>
+                        <th>Telefono</th>
+                        <th>Email</th>
+                        <th>Institucion</th>
+                        <th>Profesion</th>
+                        <th>Codigo externo</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>
@@ -312,6 +328,7 @@ function ClientesPage() {
                         <td>{cliente.nombre}</td>
                         <td>{cliente.apellido}</td>
                         <td>{cliente.telefono}</td>
+                        <td>{cliente.email || '-'}</td>
                         <td>{getInstitucionNombre(cliente.institucion_id)}</td>
                         <td>{getProfesionNombre(cliente.profesion_id)}</td>
                         <td>{cliente.codigo_externo}</td>

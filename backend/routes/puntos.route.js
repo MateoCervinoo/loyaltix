@@ -11,6 +11,7 @@ const Cliente = require('../models/cliente.model');
 
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
+const { enviarEmail } = require('../services/email.service');
 
 const calcularPuntos = (montoCompra, montoBase, puntosBase) => {
     return Math.floor((Number(montoCompra) * Number(puntosBase)) / Number(montoBase));
@@ -195,6 +196,18 @@ router.post(
                 configuracion_puntos_id: configuracion.id,
                 beneficio_id: null
             });
+
+            if (cliente.email) {
+                try {
+                    await enviarEmail(
+                        cliente.email,
+                        'Puntos acreditados',
+                        `Se te acreditaron ${puntosCalculados} puntos`
+                    );
+                } catch (emailError) {
+                    console.error('Error al enviar email de puntos acreditados:', emailError);
+                }
+            }
 
             return res.status(201).json(item);
         } catch (err) {

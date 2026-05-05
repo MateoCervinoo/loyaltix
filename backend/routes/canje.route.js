@@ -11,6 +11,7 @@ const MovimientoPuntos = require('../models/movimientoPuntos.model');
 
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
+const { enviarEmail } = require('../services/email.service');
 
 const generarCodigoCanje = (id) => {
     return `CANJE-${String(id).padStart(4, '0')}`;
@@ -118,6 +119,18 @@ router.post(
             );
 
             await transaction.commit();
+
+            if (cliente.email) {
+                try {
+                    await enviarEmail(
+                        cliente.email,
+                        'Canje realizado',
+                        `Canjeaste: ${beneficio.nombre}`
+                    );
+                } catch (emailError) {
+                    console.error('Error al enviar email de canje realizado:', emailError);
+                }
+            }
 
             return res.status(201).json({
                 message: 'Canje creado correctamente',

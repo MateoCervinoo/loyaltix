@@ -18,7 +18,7 @@ const dashboardRoutes = require('./routes/dashboard.route');
 
 // Crear servidor
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173'

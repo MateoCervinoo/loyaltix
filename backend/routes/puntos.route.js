@@ -12,6 +12,12 @@ const Cliente = require('../models/cliente.model');
 const authMiddleware = require('../middlewares/auth.middleware');
 const roleMiddleware = require('../middlewares/role.middleware');
 const { enviarEmail } = require('../services/email.service');
+const {
+    parseExcelRows,
+    validateBulkRow,
+    validateBulkRows,
+    saveBulkRows
+} = require('../services/puntosBulkUpload.service');
 
 const calcularPuntos = (montoCompra, montoBase, puntosBase) => {
     return Math.floor((Number(montoCompra) * Number(puntosBase)) / Number(montoBase));
@@ -25,6 +31,79 @@ const obtenerSaldoCliente = async (clienteId, transaction = null) => {
 
     return saldo || 0;
 };
+
+// POST /api/puntos/bulk-preview
+router.post(
+    '/bulk-preview',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
+        try {
+            const rows = parseExcelRows(req.body.fileBase64);
+            const preview = await validateBulkRows(rows);
+
+            return res.status(200).json(preview);
+        } catch (error) {
+            console.error(error);
+            return res.status(error.status || 500).json({
+                error: error.message || 'Error interno del servidor'
+            });
+        }
+    }
+);
+
+// POST /api/puntos/bulk-revalidate-row
+router.post(
+    '/bulk-revalidate-row',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
+        try {
+            const row = await validateBulkRow(req.body);
+
+            return res.status(200).json(row);
+        } catch (error) {
+            console.error(error);
+            return res.status(error.status || 500).json({
+                error: error.message || 'Error interno del servidor'
+            });
+        }
+    }
+);
+
+// POST /api/puntos/bulk-confirm
+router.post(
+    '/bulk-confirm',
+    authMiddleware,
+    roleMiddleware('ADMIN', 'VENDEDOR'),
+    async (req, res) => {
+        const transaction = await sequelize.transaction();
+
+        try {
+            const rows = Array.isArray(req.body.rows) ? req.body.rows : [];
+            const result = await saveBulkRows({
+                rows,
+                usuarioId: req.usuario.id,
+                transaction
+            });
+
+            await transaction.commit();
+
+            return res.status(201).json({
+                message: `${result.movimientosCreados} movimientos acreditados`,
+                ...result
+            });
+        } catch (error) {
+            await transaction.rollback();
+
+            console.error(error);
+            return res.status(error.status || 500).json({
+                error: error.message || 'Error interno del servidor',
+                validation: error.validation
+            });
+        }
+    }
+);
 
 // GET /api/puntos/cliente/:id/saldo
 router.get(

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import FormLabel from '../../components/FormLabel';
-import BackToDashboard from '../../components/BackToDashboard';
 
 const initialForm = {
     nombre: '',
@@ -93,8 +92,7 @@ function ProfesionesPage() {
 
     return (
         <div>
-        <BackToDashboard />
-        <h2 className="mb-4">Profesiones</h2>
+                <h2 className="mb-4">Profesiones</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
         {mensaje && <div className="alert alert-success">{mensaje}</div>}

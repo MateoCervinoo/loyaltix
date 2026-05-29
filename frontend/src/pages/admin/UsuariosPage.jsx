@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import ClienteSelectorModal from '../../components/ClienteSelectorModal';
 import FormLabel from '../../components/FormLabel';
-import BackToDashboard from '../../components/BackToDashboard';
 import { showToast } from '../../components/showToast';
 
 const initialForm = {
@@ -153,8 +152,7 @@ function UsuariosPage() {
 
     return (
         <div>
-        <BackToDashboard />
-        <h2 className="mb-4">Usuarios</h2>
+                <h2 className="mb-4">Usuarios</h2>
 
         <div className="card shadow-sm mb-4">
             <div className="card-body">

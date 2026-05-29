@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import logo from '../resources/logo/loyaltix-logo-notag.png';
 
 function AdminLayout() {
     const { usuario, logout } = useAuth();
+    const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
@@ -32,7 +33,19 @@ function AdminLayout() {
                 style={{
                 height: '36px',
                 objectFit: 'contain',
+                cursor: 'pointer',
+                transition: 'filter 0.2s, opacity 0.2s',
+                filter: 'brightness(1)'
                 }}
+                onClick={() => {
+                    let target = '/';
+                    if (usuario?.rol === 'ADMIN') target = '/admin';
+                    else if (usuario?.rol === 'VENDEDOR') target = '/vendedor';
+                    else if (usuario?.rol === 'CLIENTE') target = '/cliente';
+                    navigate(target);
+                }}
+                onMouseOver={e => { e.currentTarget.style.filter = 'brightness(0.92)'; e.currentTarget.style.opacity=0.92; }}
+                onMouseOut={e => { e.currentTarget.style.filter = 'brightness(1)'; e.currentTarget.style.opacity=1; }}
             />
             </div>
 
@@ -65,6 +78,7 @@ function AdminLayout() {
                 flexDirection: 'column',
                 padding: '20px',
                 boxShadow: '2px 0 16px rgba(0,0,0,0.25)',
+                overflowY: 'auto',
                 }}
             >
                 <div className="d-flex justify-content-between align-items-center mb-4">
@@ -79,86 +93,87 @@ function AdminLayout() {
                 </button>
                 </div>
 
-                <div className="d-flex flex-column gap-2">
-                <Link
-                    to="/dashboard"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
-                >
-                    Dashboard
-                </Link>
-
-                <Link
-                    to="/clientes-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
-                >
-                    Clientes
-                </Link>
-
-                {usuario?.rol === 'ADMIN' && (
+                <div className="d-flex flex-column gap-3">
+                    <span style={{fontWeight:600, marginTop:8, letterSpacing:1}}>Operaciones</span>
                     <Link
-                    to="/usuarios-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
+                        to="/puntos-admin"
+                        onClick={() => setMenuOpen(false)}
+                        style={sidebarLinkStyle}
                     >
-                    Usuarios
+                        Cargas
                     </Link>
-                )}
 
-                {usuario?.rol === 'ADMIN' && (
+                    <span style={{fontWeight:600, marginTop:16, letterSpacing:1}}>Movimientos</span>
                     <Link
-                    to="/instituciones-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
+                        to="/puntos-historial-admin"
+                        onClick={() => setMenuOpen(false)}
+                        style={sidebarLinkStyle}
                     >
-                    Instituciones
+                        Historial
                     </Link>
-                )}
 
-                {usuario?.rol === 'ADMIN' && (
+                    <span style={{fontWeight:600, marginTop:16, letterSpacing:1}}>Clientes</span>
                     <Link
-                    to="/profesiones-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
+                        to="/clientes-admin"
+                        onClick={() => setMenuOpen(false)}
+                        style={sidebarLinkStyle}
                     >
-                    Profesiones
+                        Clientes
                     </Link>
-                )}
 
-                <Link
-                    to="/beneficios-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
-                >
-                    Beneficios
-                </Link>
+                    {usuario?.rol === 'ADMIN' && (
+                        <Link
+                            to="/usuarios-admin"
+                            onClick={() => setMenuOpen(false)}
+                            style={sidebarLinkStyle}
+                        >
+                            Usuarios
+                        </Link>
+                    )}
+                    {usuario?.rol === 'ADMIN' && (
+                        <Link
+                            to="/instituciones-admin"
+                            onClick={() => setMenuOpen(false)}
+                            style={sidebarLinkStyle}
+                        >
+                            Instituciones
+                        </Link>
+                    )}
+                    {usuario?.rol === 'ADMIN' && (
+                        <Link
+                            to="/profesiones-admin"
+                            onClick={() => setMenuOpen(false)}
+                            style={sidebarLinkStyle}
+                        >
+                            Profesiones
+                        </Link>
+                    )}
 
-                <Link
-                    to="/canjes-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
-                >
-                    Canjes
-                </Link>
+                    <span style={{fontWeight:600, marginTop:16, letterSpacing:1}}>Otros</span>
 
-                <Link
-                    to="/puntos-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
-                >
-                    Puntos
-                </Link>
-
-                {usuario?.rol === 'ADMIN' && (
                     <Link
-                    to="/configuracion-puntos-admin"
-                    onClick={() => setMenuOpen(false)}
-                    style={sidebarLinkStyle}
+                        to="/beneficios-admin"
+                        onClick={() => setMenuOpen(false)}
+                        style={sidebarLinkStyle}
                     >
-                    Configuración
+                        Beneficios
                     </Link>
-                )}
+                    <Link
+                        to="/canjes-admin"
+                        onClick={() => setMenuOpen(false)}
+                        style={sidebarLinkStyle}
+                    >
+                        Canjes
+                    </Link>
+                    {usuario?.rol === 'ADMIN' && (
+                        <Link
+                            to="/configuracion-puntos-admin"
+                            onClick={() => setMenuOpen(false)}
+                            style={sidebarLinkStyle}
+                        >
+                            Configuración
+                        </Link>
+                    )}
                 </div>
 
                 <div
@@ -219,7 +234,7 @@ function AdminLayout() {
         </main>
 
         <footer className="text-center py-3">
-            LoyalTix v1.1.0 — © 2026
+            LoyalTix v1.2.1 — © 2026
         </footer>
         </div>
     );

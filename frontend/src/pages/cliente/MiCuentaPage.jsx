@@ -119,7 +119,7 @@ function MiCuentaPage() {
 
     return (
         <div className="container py-3">
-        <h2 className="mb-4">Mi cuenta</h2>
+        <h2 className="mb-4" id="inicio">Mi cuenta</h2>
 
         <div className="row g-4 mb-4">
             <div className="col-lg-4">
@@ -139,7 +139,7 @@ function MiCuentaPage() {
             <div className="card shadow-sm h-100">
                 <div className="card-body">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="card-title mb-0">Últimos movimientos</h5>
+                    <h5 className="card-title mb-0" id="movimientos">Últimos movimientos</h5>
                     <button
                     type="button"
                     className="btn btn-outline-primary btn-sm"
@@ -185,6 +185,7 @@ function MiCuentaPage() {
 
         <div className="row g-4 mb-4">
             <div className="col-lg-12">
+            <h5 className="mb-2 ps-3" id="canjes">Mis Canjes</h5>
             <MisCanjesCard
                 canjes={canjes}
                 loading={loadingCanjes}
@@ -195,7 +196,7 @@ function MiCuentaPage() {
 
         <div className="card shadow-sm">
             <div className="card-body">
-            <h5 className="card-title mb-3">Beneficios disponibles</h5>
+            <h5 className="card-title mb-3" id="beneficios">Beneficios disponibles</h5>
 
             {loadingBeneficios ? (
                 <p>Cargando beneficios...</p>

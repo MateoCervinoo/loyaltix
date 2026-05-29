@@ -33,8 +33,8 @@ function HistorialCompletoModal({ show, historial, onClose }) {
                         {historial.map((mov) => (
                         <tr key={mov.id}>
                             <td>{new Date(mov.fecha).toLocaleString()}</td>
-                            <td>{mov.tipo}</td>
-                            <td>{mov.cantidad}</td>
+                            <td><span className={`badge bg-${mov.cantidad > 0 ? 'success' : 'danger'}`}>{mov.tipo}</span></td>
+                            <td style={{color: mov.cantidad > 0 ? 'green' : 'red', fontWeight:600}}>{mov.cantidad > 0 ? '+' : ''}{mov.cantidad}</td>
                             <td>{mov.descripcion}</td>
                         </tr>
                         ))}

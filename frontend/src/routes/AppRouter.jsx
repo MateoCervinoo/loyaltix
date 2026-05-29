@@ -8,6 +8,7 @@ import LoginPage from '../pages/LoginPage';
 import DashboardPage from '../pages/admin/DashboardPage';
 import BeneficiosPage from '../pages/admin/BeneficiosPage';
 import PuntosPage from '../pages/admin/PuntosPage';
+import MovementsHistoryPage from '../pages/admin/MovementsHistoryPage';
 import MiCuentaPage from '../pages/cliente/MiCuentaPage';
 import ClientesPage from '../pages/admin/ClientesPage';
 import ConfiguracionPuntosPage from '../pages/admin/ConfiguracionPuntosPage';
@@ -65,6 +66,11 @@ function AppRouter() {
             <Route path="/profesiones-admin" element={<ProfesionesPage />} />
             <Route path="/beneficios-admin" element={<BeneficiosPage />} />
             <Route path="/puntos-admin" element={<PuntosPage />} />
+            <Route path="/puntos-historial-admin" element={
+                <ProtectedRoute rolesPermitidos={['ADMIN', 'VENDEDOR']}>
+                    <MovementsHistoryPage />
+                </ProtectedRoute>
+            } />
             <Route path="/configuracion-puntos-admin" element={<ConfiguracionPuntosPage />} />
             <Route path="/canjes-admin" element={<CanjesPendientesPage />} />
         </Route>

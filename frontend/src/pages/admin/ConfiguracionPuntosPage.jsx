@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
 import FormLabel from '../../components/FormLabel';
-import BackToDashboard from '../../components/BackToDashboard';
 import ConfirmModal from '../../components/ConfirmModal';
 import { showToast } from '../../components/showToast';
 
@@ -129,8 +128,7 @@ function ConfiguracionPuntosPage() {
 
     return (
         <div>
-        <BackToDashboard />
-        <h2 className="mb-4">Configuración de puntos</h2>
+                <h2 className="mb-4">Configuración de puntos</h2>
 
         {usuario?.rol === 'ADMIN' && (
             <div className="card shadow-sm mb-4">

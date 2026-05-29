@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
-import BackToDashboard from '../../components/BackToDashboard';
 import ConfirmModal from '../../components/ConfirmModal';
+import BackToDashboard from '../../components/BackToDashboard';
 import { showToast } from '../../components/showToast';
 
 function CanjesPendientesPage() {
@@ -76,8 +76,8 @@ function CanjesPendientesPage() {
 
     return (
         <div>
-        <BackToDashboard />
-        <h2 className="mb-4">Canjes pendientes</h2>
+                <BackToDashboard />
+            <h2 className="mb-4">Canjes pendientes</h2>
 
         <div className="card shadow-sm">
             <div className="card-body">

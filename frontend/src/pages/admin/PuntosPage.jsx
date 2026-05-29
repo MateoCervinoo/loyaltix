@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom';
 import api from '../../api/axios';
 import { useAuth } from '../../auth/useAuth';
 import ClienteSelectorModal from '../../components/ClienteSelectorModal';
-import FormLabel from '../../components/FormLabel';
 import BackToDashboard from '../../components/BackToDashboard';
+import FormLabel from '../../components/FormLabel';
 import ConfirmModal from '../../components/ConfirmModal';
 import { showToast } from '../../components/showToast';
 
@@ -93,12 +93,14 @@ function BulkEditModal({ row, saving, onChange, onCancel, onSubmit }) {
 function PuntosPage() {
     const { usuario } = useAuth();
 
+    const [activeMode, setActiveMode] = useState('manual');
+
     const [clienteId, setClienteId] = useState('');
     const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
     const [showClienteModal, setShowClienteModal] = useState(false);
 
     const [saldo, setSaldo] = useState(null);
-    const [historial, setHistorial] = useState([]);
+    const [, setHistorial] = useState([]);
 
     const [montoCompra, setMontoCompra] = useState('');
     const [descripcionCarga, setDescripcionCarga] = useState('');
@@ -121,6 +123,12 @@ function PuntosPage() {
         () => bulkRows.length > 0 && bulkRows.every((row) => row.valido) && !bulkConfirming,
         [bulkRows, bulkConfirming]
     );
+
+    const loadModes = [
+        { key: 'manual', label: 'Carga manual' },
+        { key: 'masiva', label: 'Carga masiva' },
+        ...(usuario?.rol === 'ADMIN' ? [{ key: 'ajuste', label: 'Ajuste manual' }] : []),
+    ];
 
     const buscarDatosCliente = async () => {
         try {
@@ -317,8 +325,26 @@ function PuntosPage() {
     return (
         <div>
         <BackToDashboard />
-        <h2 className="mb-4">Puntos</h2>
+        <h2 className="mb-4">Cargas</h2>
 
+        <div className="card shadow-sm mb-4">
+            <div className="card-body">
+            <div className="btn-group" role="group" aria-label="Tipos de carga">
+                {loadModes.map((mode) => (
+                <button
+                    key={mode.key}
+                    type="button"
+                    className={`btn ${activeMode === mode.key ? 'btn-primary' : 'btn-outline-primary'}`}
+                    onClick={() => setActiveMode(mode.key)}
+                >
+                    {mode.label}
+                </button>
+                ))}
+            </div>
+            </div>
+        </div>
+
+        {activeMode !== 'masiva' && (
         <div className="card shadow-sm mb-4">
             <div className="card-body">
             <h5 className="mb-3">Buscar cliente</h5>
@@ -354,16 +380,18 @@ function PuntosPage() {
 
                 <div className="col-md-3">
                     <button className="btn btn-primary" type="submit" disabled={loading || !clienteId}>
-                    {loading ? 'Buscando...' : 'Buscar saldo e historial'}
+                    {loading ? 'Buscando...' : 'Buscar saldo'}
                     </button>
                 </div>
                 </div>
             </form>
             </div>
         </div>
+        )}
 
         {(usuario?.rol === 'ADMIN' || usuario?.rol === 'VENDEDOR') && (
             <>
+            {activeMode === 'manual' && (
             <div className="card shadow-sm mb-4">
             <div className="card-body">
                 <h5 className="mb-3">Cargar puntos</h5>
@@ -405,7 +433,9 @@ function PuntosPage() {
                 </form>
             </div>
             </div>
+            )}
 
+            {activeMode === 'masiva' && (
             <div className="card shadow-sm mb-4">
             <div className="card-body">
                 <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
@@ -512,10 +542,11 @@ function PuntosPage() {
                 )}
             </div>
             </div>
+            )}
             </>
         )}
 
-        {usuario?.rol === 'ADMIN' && (
+        {usuario?.rol === 'ADMIN' && activeMode === 'ajuste' && (
             <div className="card shadow-sm mb-4">
             <div className="card-body">
                 <h5 className="mb-3">Ajuste manual</h5>
@@ -569,39 +600,6 @@ function PuntosPage() {
             </div>
             </div>
         )}
-
-        <div className="card shadow-sm">
-            <div className="card-body">
-            <h5 className="mb-3">Historial</h5>
-
-            {historial.length === 0 ? (
-                <p className="text-muted mb-0">No hay historial para mostrar.</p>
-            ) : (
-                <div className="table-responsive">
-                <table className="table table-sm align-middle">
-                    <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Tipo</th>
-                        <th>Cantidad</th>
-                        <th>Descripcion</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {historial.map((mov) => (
-                        <tr key={mov.id}>
-                        <td>{new Date(mov.fecha).toLocaleString()}</td>
-                        <td>{mov.tipo}</td>
-                        <td>{mov.cantidad}</td>
-                        <td>{mov.descripcion}</td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-                </div>
-            )}
-            </div>
-        </div>
 
         <ClienteSelectorModal
             show={showClienteModal}

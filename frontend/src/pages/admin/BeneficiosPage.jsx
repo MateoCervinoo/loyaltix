@@ -143,7 +143,7 @@ function BeneficiosPage() {
 
     return (
         <div>
-        <BackToDashboard />
+                <BackToDashboard />
         <h2 className="mb-4">Beneficios</h2>
 
         {usuario?.rol === 'ADMIN' && (

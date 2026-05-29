@@ -147,8 +147,8 @@ function ClientesPage() {
 
     return (
         <div>
-        <BackToDashboard />
-        <h2 className="mb-4">Clientes</h2>
+                <BackToDashboard />
+            <h2 className="mb-4">Clientes</h2>
 
         <div className="card shadow-sm mb-4">
             <div className="card-body">
